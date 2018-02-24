@@ -7,6 +7,7 @@
 #include "Trie.h"
 #include "lexerDef.h"
 #include <ctype.h>
+#include "parserDef.h"
 
 #define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])
 
@@ -52,7 +53,7 @@ void insert(struct TrieNode *root, const char *key, int type)
 
     for (level = 0; level < length; level++)
     {
-        index = CHAR_TO_INDEX(key[level]);
+        index = CHAR_TO_INDEX(tolower(key[level]));
         if (!pCrawl->children[index])
             pCrawl->children[index] = getNode();
 
@@ -79,6 +80,41 @@ int search(struct TrieNode *root, const char *key)
             return 0;
         }
         index = CHAR_TO_INDEX(key[level]);
+
+        if (!pCrawl->children[index])
+            return 0;
+
+        pCrawl = pCrawl->children[index];
+    }
+
+    if (pCrawl != NULL && pCrawl->isEndOfWord)
+    {
+        return pCrawl->type;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int searchforgrammer(struct TrieNode *root, const char *key)
+{
+    int level;
+    int length = strlen(key);
+    int index;
+    struct TrieNode *pCrawl = root;
+
+    for (level = 0; level < length; level++)
+    {
+        // if (isupper(key[level]))
+        // {
+        //     return 0;
+        // }
+        // if (isalpha(key[level]) == 0)
+        // {
+        //     return 0;
+        // }
+        index = CHAR_TO_INDEX(tolower(key[level]));
 
         if (!pCrawl->children[index])
             return 0;
@@ -127,3 +163,108 @@ int search(struct TrieNode *root, const char *key)
 
 //     return 0;
 // }
+struct TrieNode *FillTrieforGrammer()
+{
+    char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
+    // char keys[][11] = {"end", "int", "real", "string", "matrix",
+    //    "if", "else", "endif", "read", "print", "function"};
+    int type1[44] = {
+        mainFunction,
+        stmtsAndFunctionDefs,
+        moreStmtAndFunctionDefs,
+        stmtOrFunctionDef,
+        stmt,
+        functionDef,
+        parameterList,
+        typevar,
+        remainingList,
+        declarationStmt,
+        varList,
+        moreIds,
+        assignFuncCallSizeStmt,
+        funcCallSizeStmt,
+        sizeStmt,
+        conditionalStmt,
+        otherStmts,
+        elseStmt,
+        ioStmt,
+        funCallStmt,
+        emptyOrInputParameterList,
+        inputParameterList,
+        listVar,
+        assignmentStmt,
+        arithmeticExpression,
+        arithmeticExpression1,
+        arithmeticExpression2,
+        arithmeticExpression3,
+        varExpression,
+        operatorplusminus,
+        operatormuldiv,
+        booleanExpression,
+        booleanExpression2,
+        moreBooleanExpression,
+        constrainedVars,
+        matrixVar,
+        matrixRows,
+        matrixRows1,
+        matrixRow,
+        matrixRow1,
+        var,
+        matrixElement,
+        logicalOp,
+        relationalOp};
+    int i;
+    struct TrieNode *root = getNode();
+
+    for (i = 0; i < ARRAY_SIZE(keys1); i++)
+        insert(root, keys1[i], type1[i]);
+
+    char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
+    int type2[43] = {
+        NONE,
+        ERROR,
+        ASSIGNOP,
+        COMMENT,
+        FUNID,
+        ID,
+        NUM,
+        RNUM,
+        STR,
+        END,
+        INT,
+        REAL,
+        STRING,
+        MATRIX,
+        MAIN,
+        SQO,
+        SQC,
+        OP,
+        CL,
+        SEMICOLON,
+        COMMA,
+        IF,
+        ELSE,
+        ENDIF,
+        READ,
+        PRINT,
+        FUNCTION,
+        PLUS,
+        MINUS,
+        MUL,
+        DIV,
+        SIZE,
+        AND,
+        OR,
+        NOT,
+        LT,
+        LE,
+        EQ,
+        GT,
+        GE,
+        NE,
+        EPSILON,
+        FINISH};
+    for (i = 0; i < ARRAY_SIZE(keys2); i++)
+        insert(root, keys2[i], type2[i]);
+    return root;
+}

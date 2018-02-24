@@ -14,3 +14,4 @@ struct TrieNode
 struct TrieNode *getNode(void);
 void insert(struct TrieNode *root, const char *key, int type);
 int search(struct TrieNode *root, const char *key);
+int searchforgrammer(struct TrieNode *root, const char *key);
