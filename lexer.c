@@ -4,10 +4,13 @@
 #include <string.h>
 #include <ctype.h>
 #include "lexerDef.h"
+#include "Trie.h"
+#define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])
 
 extern int lineNo, bufSize, bufIndex;
 extern char *buf;
 extern FILE *fp;
+extern struct TrieNode *root;
 
 FILE *getStream(FILE *fp, char *buf)
 {
@@ -41,17 +44,9 @@ FILE *getStream(FILE *fp, char *buf)
     }
 }
 
-// tokenPtr getNextToken(char *buf, enum tokenType *type, int *value, char *string, tokenPtr *prev, int *state)
-// {
-//     int i = 0;
-//     while (buf[i] != '\0')
-//     {
-//     }
-// };
-
 int getNextState(tokenPtr tokenp, int currentstate, char c)
 {
-    int state;
+    int state, type;
     switch (currentstate)
     {
     case 0:
@@ -318,6 +313,13 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             tokenp->type = ID;
             // LOOKUPTABLE
+            type = search(root, tokenp->string);
+            if (type != 0)
+            {
+                tokenp->type = type;
+                free(tokenp->string);
+                tokenp->string = NULL;
+            }
             tokenp->lineno = lineNo;
             break;
         }
@@ -635,6 +637,19 @@ tokenPtr getNextToken()
     //     {
     //     }
     // }
+}
+
+struct TrieNode *FillTrie()
+{
+    char keys[][11] = {"end", "int", "real", "string", "matrix",
+                       "if", "else", "endif", "read", "print", "function"};
+    int type[11] = {END, INT, REAL, STRING, MATRIX, IF, ELSE, ENDIF, REAL, PRINT, FUNCTION};
+    int i;
+    struct TrieNode *root = getNode();
+
+    for (i = 0; i < ARRAY_SIZE(keys); i++)
+        insert(root, keys[i], type[i]);
+    return root;
 }
 
 const char *typeTok[] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "FINISH"};

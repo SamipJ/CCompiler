@@ -2,7 +2,7 @@ run : linkall
 	./exe
 
 linkall: driver
-	gcc lexer.o driver.o -o exe
+	gcc lexer.o Trie.o driver.o -o exe
 
 gdb : linkall
 	gdb exe
@@ -10,8 +10,9 @@ gdb : linkall
 driver: lexer driver.c
 	gcc -c -g driver.c
 
-lexer: lexer.h lexerDef.h lexer.c
+lexer: lexer.h lexerDef.h lexer.c Trie.c
+	gcc -c -g Trie.c
 	gcc -c -g lexer.c
 
 clean:
-	rm *.o exe
+	rm *.o exe output

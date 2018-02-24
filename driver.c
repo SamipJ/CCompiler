@@ -1,9 +1,11 @@
 // SAMIP JASANI 2015A7PS0127P
 #include "lexer.h"
+#include "Trie.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 int lineNo, bufSize, bufIndex;
+struct TrieNode *root;
 char *buf;
 FILE *fp;
 
@@ -23,6 +25,7 @@ int main(int argc, char **argv)
     }
     fp = getStream(fp, buf);
     tokenPtr t; // = calloc(1, sizeof(Token));
+    root = FillTrie();
     while (fp != NULL || buf[bufIndex] != '\0')
     {
         t = getNextToken();
