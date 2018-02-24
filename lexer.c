@@ -11,6 +11,7 @@ extern int lineNo, bufSize, bufIndex;
 extern char *buf;
 extern FILE *fp;
 extern struct TrieNode *root;
+extern int strsize;
 
 FILE *getStream(FILE *fp, char *buf)
 {
@@ -67,6 +68,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             break;
         case '"':
             state = 10;
+            strsize = 1;
             bufIndex++;
             break;
         case '\r':
@@ -226,7 +228,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
         }
         break;
 
@@ -260,7 +262,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
         }
         break;
     case 5:
@@ -353,7 +355,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
         }
         break;
     case 9:
@@ -381,6 +383,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             tokenp->string[0] = '"';
             tokenp->string[1] = c;
             tokenp->string[2] = '\0';
+            strsize++;
             bufIndex++;
         }
         else
@@ -388,23 +391,24 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
         }
         break;
     case 11:
-        if (isalpha(c) || c == ' ')
+        if ((isalpha(c) || c == ' ') && strsize < 19)
         {
             tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
             tokenp->string[strlen(tokenp->string) + 1] = '\0';
             tokenp->string[strlen(tokenp->string)] = c;
+            strsize++;
             bufIndex++;
         }
-        else if (c == '"')
+        else if (c == '"' && strsize < 20)
         {
             tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
             tokenp->string[strlen(tokenp->string) + 1] = '\0';
             tokenp->string[strlen(tokenp->string)] = c;
             bufIndex++;
+            strsize++;
             tokenp->type = STR;
             tokenp->lineno = lineNo;
             state = -1;
@@ -414,7 +418,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
         }
         break;
     case 12:
@@ -474,7 +478,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
             break;
         }
     case 15:
@@ -489,7 +493,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
             break;
         }
     case 16:
@@ -504,7 +508,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
             break;
         }
     case 17:
@@ -521,7 +525,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
             break;
         }
     case 18:
@@ -536,7 +540,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
             break;
         }
     case 19:
@@ -553,7 +557,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
             break;
         }
     case 20:
@@ -568,7 +572,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
             break;
         }
     case 21:
@@ -583,7 +587,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
             break;
         }
     case 22:
@@ -600,7 +604,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
-            bufIndex++;
+            // bufIndex++;
             break;
         }
     }
@@ -652,7 +656,7 @@ struct TrieNode *FillTrie()
     return root;
 }
 
-const char *typeTok[] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "FINISH"};
+const char *typeTok[] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
 void printToken(tokenPtr t)
 {
     if (t->string == NULL)

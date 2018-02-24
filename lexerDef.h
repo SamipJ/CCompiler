@@ -45,6 +45,7 @@ enum tokenType
     GT,
     GE,
     NE,
+    EPSILON,
     FINISH
 };
 
