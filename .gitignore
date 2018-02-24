@@ -1,3 +1,8 @@
+file
+exe
+test*
+output 
+
 # Prerequisites
 *.d
 
