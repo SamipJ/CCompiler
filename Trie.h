@@ -1,3 +1,5 @@
+// SAMIP JASANI 2015A7PS0127P
+
 #define ALPHABET_SIZE (26)
 #include "lexer.h"
 #include <stdbool.h>
