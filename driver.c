@@ -1,6 +1,6 @@
 // SAMIP JASANI 2015A7PS0127P
 #include "lexer.h"
-#include "Trie.h"
+#include "_Trie.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "parser.h"
@@ -61,6 +61,7 @@ int main(int argc, char **argv)
     // printFollow(Follow);
     Rules **parseTable = MakeParseTable(G, Follow, First);
     // printParseTable(parseTable);
-    makeParseTree(parseTable);
+    Node root = makeParseTree(parseTable);
+    PrintInorderTree(root);
     return 0;
 }

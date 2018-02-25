@@ -1,6 +1,6 @@
 // SAMIP JASANI 2015A7PS0127P
 
-#include "Stack.h"
+#include "_Stack.h"
 
 // C program for array implementation of stack
 #include <stdio.h>

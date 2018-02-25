@@ -4,9 +4,10 @@
 #include <string.h>
 #include "lexer.h"
 #include "parserDef.h"
-#include "Trie.h"
+#include "_Trie.h"
 #include "parser.h"
-#include "Stack.h"
+#include "_Stack.h"
+#include "_Tree.h"
 extern int lineNo, bufSize, bufIndex;
 extern char *buf;
 extern FILE *fp;
@@ -442,26 +443,36 @@ void printParseTable(Rules **parseTable)
     }
 }
 
-void makeParseTree(Rules **parseTable)
+Node makeParseTree(Rules **parseTable)
 {
     char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
     char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
     Stack stackH = createStack(100);
     Stack revStack = createStack(100);
     Rhs Start = (Rhs)calloc(1, sizeof(rhside));
+    Rhs Finish = (Rhs)calloc(1, sizeof(rhside));
     Start->isTerminal = false;
     Start->type = mainFunction;
+    Finish->isTerminal = true;
+    Finish->type = FINISH;
+    push(stackH, Finish);
     push(stackH, Start);
+    Node root = new_node(Start, false);
+    Node currentNode = root;
     Rhs stackPop, stackPush;
     Rules stackPushRule;
     tokenPtr t;
     fp = getStream(fp, buf);
     while (fp != NULL || buf[bufIndex] != '\0' || isEmpty(stackH) == 0)
     {
+        // printf("////////////////////////////\n");
+        // PrintInorderTree(root);
+        // printf("////////////////////////////\n");
+
         t = getNextToken();
         // printToken(t);
         //remove error and comments
-        if (t->type == COMMENT || t->type == ERROR)
+        if (t->type == COMMENT || t->type == ERROR || t->type == NONE)
         {
             free(t);
             continue;
@@ -479,8 +490,10 @@ void makeParseTree(Rules **parseTable)
             }
             if (stackPop->isTerminal)
             {
-                printf("\nPOP %s\n", keys2[stackPop->type]);
-                printf("Token %s lineno %d\n", keys2[t->type], t->lineno);
+                // printf("\nPOP %s\n", keys2[stackPop->type]);
+                if (stackPop->type == FINISH)
+                    return root;
+                // printf("Token %s lineno %d\n", keys2[t->type], t->lineno);
                 if (t->type != stackPop->type)
                 {
                     printf("ERROR!!\n");
@@ -488,42 +501,60 @@ void makeParseTree(Rules **parseTable)
                 }
                 else
                 {
-                    free(t);
+                    currentNode->data = t;
+                    currentNode = nextNT(currentNode);
+                    // free(t);
                     // free(stackPop);
                     break;
                 }
             }
             else
             {
-                printf("\nPOP %s\n", keys1[stackPop->type]);
-                printf("Token %s lineno %d\n", keys2[t->type], t->lineno);
+                // printf("\nPOP %s\n", keys1[stackPop->type]);
+                // printf("Token %s lineno %d\n", keys2[t->type], t->lineno);
                 stackPushRule = parseTable[stackPop->type][t->type];
-                {
-                    // printf("\t %s :", keys1[stackPop->type]);
-                    stackPush = stackPushRule->rule;
-                    printf("<%s> ==> ", keys1[stackPop->type]);
-                    while (stackPush != NULL)
-                    {
-                        if (stackPush->isTerminal)
-                            printf("%s ", keys2[stackPush->type]);
-                        else
-                            printf("<%s> ", keys1[stackPush->type]);
-                        stackPush = stackPush->next;
-                    }
-                    printf("\n");
-                }
+
                 // free(stackPop);
                 if (stackPushRule != NULL)
                 {
+                    {
+                        // printf("\t %s :", keys1[stackPop->type]);
+                        stackPush = stackPushRule->rule;
+                        // printf("<%s> ==> ", keys1[stackPop->type]);
+                        while (stackPush != NULL)
+                        {
+                            if (stackPush->isTerminal)
+                            {
+                                // printf("%s ", keys2[stackPush->type]);
+                            }
+                            else
+                            {
+                                // printf("<%s> ", keys1[stackPush->type]);
+                            }
+                            stackPush = stackPush->next;
+                        }
+                        // printf("\n");
+                    }
                     stackPush = stackPushRule->rule;
                     while (stackPush != NULL && ((stackPush->type != EPSILON && stackPush->isTerminal) || (!stackPush->isTerminal)))
                     {
                         push(revStack, stackPush);
+                        currentNode = add_child(currentNode, stackPush, stackPush->isTerminal);
                         stackPush = stackPush->next;
                     }
-                    while (!isEmpty(revStack))
+                    if (stackPush != NULL && (stackPush->type == EPSILON && stackPush->isTerminal))
                     {
-                        push(stackH, pop(revStack));
+                        currentNode->data = stackPush;
+                        currentNode->isterminal = true;
+                        currentNode = nextNT(currentNode);
+                    }
+                    else
+                    {
+                        currentNode = currentNode->child;
+                        while (!isEmpty(revStack))
+                        {
+                            push(stackH, pop(revStack));
+                        }
                     }
                 }
                 else
@@ -534,4 +565,5 @@ void makeParseTree(Rules **parseTable)
             }
         }
     }
+    return root;
 };

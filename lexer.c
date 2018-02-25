@@ -4,7 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "lexerDef.h"
-#include "Trie.h"
+#include "_Trie.h"
 #define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])
 
 extern int lineNo, bufSize, bufIndex;
@@ -92,36 +92,54 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             bufIndex++;
             tokenp->type = SQO;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = c;
             tokenp->lineno = lineNo;
             break;
         case ']':
             state = -1;
             bufIndex++;
             tokenp->type = SQC;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = c;
             tokenp->lineno = lineNo;
             break;
         case '(':
             state = -1;
             bufIndex++;
             tokenp->type = OP;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = c;
             tokenp->lineno = lineNo;
             break;
         case ')':
             state = -1;
             bufIndex++;
             tokenp->type = CL;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = c;
             tokenp->lineno = lineNo;
             break;
         case ';':
             state = -1;
             bufIndex++;
             tokenp->type = SEMICOLON;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = c;
             tokenp->lineno = lineNo;
             break;
         case ',':
             state = -1;
             bufIndex++;
             tokenp->type = COMMA;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = c;
             tokenp->lineno = lineNo;
             break;
         case '+':
@@ -129,28 +147,43 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             bufIndex++;
             tokenp->type = PLUS;
             tokenp->lineno = lineNo;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = c;
             break;
         case '-':
             state = -1;
             bufIndex++;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = c;
             tokenp->type = MINUS;
             tokenp->lineno = lineNo;
             break;
         case '/':
             state = -1;
             bufIndex++;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = c;
             tokenp->type = DIV;
             tokenp->lineno = lineNo;
             break;
         case '@':
             state = -1;
             bufIndex++;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = c;
             tokenp->type = SIZE;
             tokenp->lineno = lineNo;
             break;
         case '*':
             state = -1;
             bufIndex++;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = c;
             tokenp->type = MUL;
             tokenp->lineno = lineNo;
             break;
@@ -205,12 +238,19 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         case '=':
             state = -1;
             tokenp->type = EQ;
+            tokenp->string = calloc(3, sizeof(char));
+            tokenp->string[2] = '\0';
+            tokenp->string[1] = '=';
+            tokenp->string[0] = '=';
             tokenp->lineno = lineNo;
             bufIndex++;
             break;
         default:
             state = -1;
             tokenp->type = ASSIGNOP;
+            tokenp->string = calloc(3, sizeof(char));
+            tokenp->string[1] = '\0';
+            tokenp->string[0] = '=';
             tokenp->lineno = lineNo;
             break;
         }
@@ -220,6 +260,11 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = NE;
+            tokenp->string = calloc(3, sizeof(char));
+            tokenp->string[3] = '\0';
+            tokenp->string[2] = '=';
+            tokenp->string[1] = '/';
+            tokenp->string[0] = '=';
             tokenp->lineno = lineNo;
             bufIndex++;
         }
@@ -281,8 +326,8 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             {
                 tokenp->lineno = lineNo;
                 tokenp->type = MAIN;
-                free(tokenp->string);
-                tokenp->string = NULL;
+                // free(tokenp->string);
+                // tokenp->string = NULL;
             }
             else
             {
@@ -319,8 +364,8 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             if (type != 0)
             {
                 tokenp->type = type;
-                free(tokenp->string);
-                tokenp->string = NULL;
+                // free(tokenp->string);
+                // tokenp->string = NULL;
             }
             tokenp->lineno = lineNo;
             break;
@@ -427,6 +472,10 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             bufIndex++;
             state = -1;
             tokenp->type = LE;
+            tokenp->string = calloc(3, sizeof(char));
+            tokenp->string[0] = '<';
+            tokenp->string[1] = '=';
+            tokenp->string[2] = '\0';
             tokenp->lineno = lineNo;
             break;
         }
@@ -434,6 +483,9 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = LT;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[0] = '<';
+            tokenp->string[1] = '\0';
             tokenp->lineno = lineNo;
             break;
         }
@@ -443,6 +495,10 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             bufIndex++;
             state = -1;
             tokenp->type = GE;
+            tokenp->string = calloc(3, sizeof(char));
+            tokenp->string[0] = '>';
+            tokenp->string[1] = '=';
+            tokenp->string[2] = '\0';
             tokenp->lineno = lineNo;
             break;
         }
@@ -450,6 +506,9 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = GT;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[0] = '>';
+            tokenp->string[1] = '\0';
             tokenp->lineno = lineNo;
             break;
         }
@@ -516,6 +575,13 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = AND;
+            tokenp->string = calloc(6, sizeof(char));
+            tokenp->string[0] = '.';
+            tokenp->string[1] = 'a';
+            tokenp->string[2] = 'n';
+            tokenp->string[3] = 'd';
+            tokenp->string[4] = '.';
+            tokenp->string[5] = '\0';
             tokenp->lineno = lineNo;
             bufIndex++;
             break;
@@ -548,6 +614,12 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = OR;
+            tokenp->string = calloc(5, sizeof(char));
+            tokenp->string[0] = '.';
+            tokenp->string[1] = 'o';
+            tokenp->string[2] = 'r';
+            tokenp->string[3] = '.';
+            tokenp->string[4] = '\0';
             tokenp->lineno = lineNo;
             bufIndex++;
             break;
@@ -595,6 +667,13 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = NOT;
+            tokenp->string = calloc(6, sizeof(char));
+            tokenp->string[0] = '.';
+            tokenp->string[1] = 'n';
+            tokenp->string[2] = 'o';
+            tokenp->string[3] = 't';
+            tokenp->string[4] = '.';
+            tokenp->string[5] = '\0';
             tokenp->lineno = lineNo;
             bufIndex++;
             break;
@@ -657,14 +736,42 @@ struct TrieNode *FillTrie()
 }
 
 const char *typeTok[] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
+// void printToken(tokenPtr t)
+// {
+//     if (t->string == NULL)
+//     {
+//         printf("Token Type: %s  Token Value: %.2f Token Line: %d\n", typeTok[t->type], t->value, t->lineno);
+//     }
+//     else
+//     {
+//         printf("Token Type: %s Token Value: %.2f Token Line: %d Token String: %s\n", typeTok[t->type], t->value, t->lineno, t->string);
+//     }
+// }
+
 void printToken(tokenPtr t)
 {
-    if (t->string == NULL)
+    if (t->type == NUM)
     {
-        printf("Token Type: %s  Token Value: %.2f Token Line: %d\n", typeTok[t->type], t->value, t->lineno);
+        printf("TOKEN: %s LINENO: %d VALUE: %d\n", typeTok[t->type], t->lineno, (int)(t->value));
     }
-    else
+    else if (t->type == RNUM)
     {
-        printf("Token Type: %s Token Value: %.2f Token Line: %d Token String: %s\n", typeTok[t->type], t->value, t->lineno, t->string);
+        printf("TOKEN: %s LINENO: %d VALUE: %.2f\n", typeTok[t->type], t->lineno, t->value);
     }
+    else //if (t->type == STR)
+    {
+        printf("TOKEN: %s LINENO: %d VALUE: %s\n", typeTok[t->type], t->lineno, t->string);
+    }
+    // else if (t->type == ID)
+    // {
+    //     printf("TOKEN: %s LINENO: %d VALUE: %s\n", typeTok[t->type], t->lineno, t->string);
+    // }
+    // else if (t->type == FUNID)
+    // {
+    //     printf("TOKEN: %s LINENO: %d VALUE: %s\n", typeTok[t->type], t->lineno, t->string);
+    // }
+    // else
+    // {
+    //     printf("TOKEN: %s LINENO: %d\n", typeTok[t->type], t->lineno);
+    // }
 }

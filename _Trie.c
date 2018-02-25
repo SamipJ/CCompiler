@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "Trie.h"
+#include "_Trie.h"
 #include "lexerDef.h"
 #include <ctype.h>
 #include "parserDef.h"

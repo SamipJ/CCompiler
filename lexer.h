@@ -7,5 +7,5 @@ FILE *getStream(FILE *fp, char *buf);
 tokenPtr getNextToken();
 void printToken(tokenPtr t);
 struct TrieNode *FillTrie();
-
+// void printToken(tokenPtr t);
 #endif
