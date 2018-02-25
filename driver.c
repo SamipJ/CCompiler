@@ -18,11 +18,11 @@ int main(int argc, char **argv)
     lineNo = 1;
     bufIndex = 0;
     int i, j;
-
+    FILE *fileout;
     // noofnt = 44;
     // nooft = 43;
     buf = (char *)calloc(bufSize, sizeof(char));
-    if (argc == 2)
+    if (argc >= 2)
     {
         fp = fopen(argv[1], "r");
     }
@@ -62,6 +62,15 @@ int main(int argc, char **argv)
     Rules **parseTable = MakeParseTable(G, Follow, First);
     // printParseTable(parseTable);
     Node root = makeParseTree(parseTable);
-    PrintInorderTree(root);
+    // PrintInorderTree(root);
+    if (argc >= 3)
+    {
+        fileout = fopen(argv[2], "w+");
+    }
+    else
+    {
+        fileout = fopen("./parsetreeoutfile.txt", "w+");
+    }
+    FileInorderTree(root, fileout);
     return 0;
 }

@@ -5,6 +5,9 @@
 #include "parserDef.h"
 #include "lexer.h"
 
+const char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
+const char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
+
 Node new_node(void *ptr, bool isterminal)
 {
     Node newNode = calloc(1, sizeof(node));
@@ -96,8 +99,8 @@ Node nextNT(Node n)
 // }
 void PrintInorderTree(Node n)
 {
-    char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
-    char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
+    // char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
+    // char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
     if (n->child)
     {
         printf("\\|/\n");
@@ -120,16 +123,45 @@ void PrintInorderTree(Node n)
             PrintInorderTree(n);
         }
         printf("/|\\\n");
+    }
+}
 
-    } // while (n->child)
-    // {
-    //     n = n->child;
-    // }
-    // if (n->isterminal)
-    //     printf("%d", (tokenPtr)(n->data)->type);
-    // else
-    //     printf("%d", (Rhs)(n->data)->type)
-    // while(n->sibling){
-
-    // }
+void FileInorderTree(Node n, FILE *fp)
+{
+    if (n->child)
+    {
+        FileInorderTree(n->child, fp);
+    }
+    if (n->isterminal)
+    {
+        if (((tokenPtr)(n->data))->type == NUM)
+        {
+            fprintf(fp, "--------------------\t%-5d\t%-20s\t%-10d\t%-20s\tyes\t\t--------------------\n", ((tokenPtr)(n->data))->lineno, keys2[((tokenPtr)(n->data))->type], (int)((tokenPtr)(n->data))->value, keys1[((Rhs)(n->parent->data))->type]);
+        }
+        else if (((tokenPtr)(n->data))->type == RNUM)
+        {
+            fprintf(fp, "--------------------\t%-5d\t%-20s\t%-10.2f\t%-20s\tyes\t\t--------------------\n", ((tokenPtr)(n->data))->lineno, keys2[((tokenPtr)(n->data))->type], ((tokenPtr)(n->data))->value, keys1[((Rhs)(n->parent->data))->type]);
+        }
+        else
+        {
+            fprintf(fp, "%-20s\t%-5d\t%-20s\t----------\t%-20s\tyes\t\t--------------------\n", ((tokenPtr)(n->data))->string, ((tokenPtr)(n->data))->lineno, keys2[((tokenPtr)(n->data))->type], keys1[((Rhs)(n->parent->data))->type]);
+        }
+    }
+    else if (n->parent == NULL)
+    {
+        fprintf(fp, "--------------------\t-----\t--------------------\t----------\tROOT                \tno\t\t%-20s\n", keys1[((Rhs)(n->data))->type]);
+    }
+    else
+    {
+        fprintf(fp, "--------------------\t-----\t--------------------\t----------\t%-20s\tno\t\t%-20s\n", keys1[((Rhs)(n->parent->data))->type], keys1[((Rhs)(n->data))->type]);
+    }
+    n = n->child;
+    if (n)
+    {
+        while (n->sibling)
+        {
+            n = n->sibling;
+            FileInorderTree(n, fp);
+        }
+    }
 }

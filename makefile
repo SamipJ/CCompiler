@@ -1,5 +1,5 @@
 run : linkall
-	./exe ./testcases/testcase1.txt
+	./exe ./testcases/testcase1.txt ./parsetreeoutfile.txt
 
 linkall: driver
 	gcc lexer.o _Tree.o _Trie.o _Stack.o parser.o driver.o -o exe

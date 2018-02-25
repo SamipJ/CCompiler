@@ -3,6 +3,7 @@
 #define TREE_H
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 typedef struct node node;
 
 typedef node *Node;
@@ -20,4 +21,5 @@ Node add_sibling(Node n, void *ptr, bool isterminal);
 Node add_child(Node n, void *ptr, bool isterminal);
 Node nextNT(Node n);
 void PrintInorderTree(Node n);
+void FileInorderTree(Node n, FILE *fp);
 #endif
