@@ -2,8 +2,8 @@
 <stmtsAndFunctionDefs> ===> <stmtOrFunctionDef> <moreStmtAndFunctionDefs>
 <moreStmtAndFunctionDefs> ===> <stmtsAndFunctionDefs> | EPSILON
 <stmtOrFunctionDef> ===> <stmt> | <functionDef>
-<stmt> ===> <declarationStmt> | ID ASSIGNOP <assignFuncCallSizeStmt> | <conditionalStmt> | <ioStmt> |  SQO <var_list> SQC ASSIGNOP <funcCallSizeStmt> | <funcCallStmt>
-<functionDef> ===> FUNCTION SQO <parameterList> SQC ASSIGNOP FUNID SQO <parameter_list> SQC <stmtsAndFunctionDefs> END
+<stmt> ===> <declarationStmt> | ID ASSIGNOP <assignFuncCallSizeStmt> | <conditionalStmt> | <ioStmt> |  SQO <varList> SQC ASSIGNOP <funcCallSizeStmt> | <funCallStmt>
+<functionDef> ===> FUNCTION SQO <parameterList> SQC ASSIGNOP FUNID SQO <parameterList> SQC <stmtsAndFunctionDefs> END
 <parameterList> ===> <typevar> ID <remainingList>
 <typevar> ===> INT | REAL | STRING | MATRIX
 <remainingList> ===> COMMA <parameterList> | EPSILON
@@ -14,8 +14,8 @@
 <funcCallSizeStmt> ===> <funCallStmt> | <sizeStmt>
 <sizeStmt> ===> SIZE ID SEMICOLON
 <conditionalStmt> ===> IF <booleanExpression> <stmt> <otherStmts> <elseStmt> ENDIF
-<otherStmts> ===> <stmt><otherStmts> | EPSILON
-<elseStmt> ===> ELSE <stmt><otherStmts> | EPSILON
+<otherStmts> ===> <stmt> <otherStmts> | EPSILON
+<elseStmt> ===> ELSE <stmt> <otherStmts> | EPSILON
 <ioStmt> ===> READ OP ID CL SEMICOLON | PRINT OP ID CL SEMICOLON
 <funCallStmt> ===> FUNID OP <emptyOrInputParameterList> CL SEMICOLON 
 <emptyOrInputParameterList> ===> <inputParameterList> | EPSILON
@@ -35,7 +35,7 @@
 <constrainedVars> ===> ID | NUM | RNUM
 <matrixVar> ===> SQO <matrixRows> SQC
 <matrixRows> ===> <matrixRow> <matrixRows1> 
-<matrixRows1> ===> SEMICOLON <matrixRows>| EPSILON
+<matrixRows1> ===> SEMICOLON <matrixRows> | EPSILON
 <matrixRow> ===> NUM <matrixRow1>
 <matrixRow1> ===> COMMA <matrixRow> | EPSILON
 <var> ===> ID <matrixElement> | NUM | RNUM | <matrixVar> | STR 
