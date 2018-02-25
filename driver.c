@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include "parser.h"
 
-int lineNo, bufSize, bufIndex, noofnt;
+int lineNo, bufSize, bufIndex;
+const int noofnt = 44, nooft = 43;
 struct TrieNode *root;
 char *buf;
 FILE *fp;
@@ -16,7 +17,10 @@ int main(int argc, char **argv)
     bufSize = 1024;
     lineNo = 1;
     bufIndex = 0;
-    noofnt = 44;
+    int i, j;
+
+    // noofnt = 44;
+    // nooft = 43;
     buf = (char *)calloc(bufSize, sizeof(char));
     if (argc == 2)
     {
@@ -37,15 +41,26 @@ int main(int argc, char **argv)
     }
 
     Grammer G = readGrammer("Grammer.txt");
-    // printf("hi");
     printGrammer(G);
-    // while (fp != NULL)
-    // {
-    //     printf("%s", buf);
-    //     fp = getStream(fp, buf);
-    // }
-    // if (*buf != '\0')
-    // {
-    //     printf("%s", buf);
-    // }
+    char **First = (char **)calloc(noofnt, sizeof(char *));
+    for (i = 0; i < noofnt; i++)
+    {
+        First[i] = (char *)calloc(nooft, sizeof(char));
+        for (j = 0; j < nooft; j++)
+            First[i][j] = '0';
+    }
+    MakeFirst(G, First);
+    printFirst(First);
+    char **Follow = (char **)calloc(noofnt, sizeof(char *));
+    for (i = 0; i < noofnt; i++)
+    {
+        Follow[i] = (char *)calloc(nooft, sizeof(char));
+        for (j = 0; j < nooft; j++)
+            Follow[i][j] = '0';
+    }
+    MakeFollow(G, Follow, First);
+    printFollow(Follow);
+    Rules **parseTable = MakeParseTable(G, Follow, First);
+    printParseTable(parseTable);
+    return 0;
 }

@@ -18,4 +18,4 @@ parser: lexer
 	gcc -c -g parser.c
 
 clean:
-	rm *.o exe output
+	rm *.o exe output a.out

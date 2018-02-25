@@ -6,7 +6,9 @@
 #include "parserDef.h"
 #include "Trie.h"
 #include "parser.h"
-extern int noofnt;
+// extern int noofnt;
+
+extern const int noofnt, nooft;
 
 Grammer readGrammer(char *fname)
 {
@@ -132,6 +134,7 @@ Grammer readGrammer(char *fname)
 
 void printGrammer(Grammer G)
 {
+    printf("PRINTING GRAMMER\n");
     int i = 0;
     char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
     char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
@@ -155,6 +158,282 @@ void printGrammer(Grammer G)
             }
             printf("\n");
             currentRule = currentRule->next;
+        }
+    }
+}
+
+void MakeFirst(Grammer G, char **First)
+{
+    int i;
+    char firstDone[noofnt];
+    // Rules currentRule;
+    // Rhs currentRhs;
+    for (i = 0; i < noofnt; i++)
+    {
+        firstDone[i] = '0';
+    }
+    for (i = 0; i < noofnt; i++)
+    {
+        if (firstDone[i] == '1')
+            continue;
+        else
+        {
+            FirstDAC(G, First, firstDone, i);
+        }
+        // currentRule = G[i];
+        // while(currentRule!=NULL){
+        // ??
+        // currentRule = currentRule->next;
+    }
+    return;
+}
+
+void FirstDAC(Grammer G, char **First, char *firstDone, int key)
+{
+    int i;
+    if (firstDone[key] == '1')
+    {
+        return;
+    }
+    else
+    {
+        Rules currentRule = G[key];
+        while (currentRule != NULL)
+        {
+            Rhs currentRhs = currentRule->rule;
+
+            while (currentRhs != NULL)
+            {
+                if (currentRhs->isTerminal)
+                {
+                    First[key][currentRhs->type] = '1';
+                    break;
+                }
+                else
+                {
+                    if (firstDone[currentRhs->type] == '0')
+                    {
+                        FirstDAC(G, First, firstDone, currentRhs->type);
+                    }
+                    //copy and check epsilon thing
+                    for (i = 0; i < nooft; i++)
+                    {
+                        if (First[currentRhs->type][i] == '1' && i != EPSILON)
+                        {
+                            if (i == 14)
+                                printf("hi");
+                            First[key][i] = '1';
+                        }
+                    }
+                    if (First[currentRhs->type][EPSILON] == '1')
+                    {
+                        currentRhs = currentRhs->next;
+                        continue;
+                        // First[key][EPSILON] = '0';
+                    }
+                    else
+                        break;
+                }
+            }
+            if (currentRhs == NULL)
+            {
+                First[key][EPSILON] = '1';
+            }
+            currentRule = currentRule->next;
+        }
+        firstDone[key] = '1';
+        return;
+    }
+}
+
+void printFirst(char **First)
+{
+    printf("PRINTING FIRST SET\n");
+    char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
+    char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
+    int i, j;
+    for (i = 0; i < noofnt; i++)
+    {
+        printf("%s :\n", keys1[i]);
+        for (j = 0; j < nooft; j++)
+        {
+            if (First[i][j] == '1')
+                printf("\t %s", keys2[j]);
+        }
+        printf("\n");
+    }
+    return;
+}
+
+void MakeFollow(Grammer G, char **Follow, char **First)
+{
+    Follow[mainFunction][FINISH] = '1';
+    int prevFollowLength = 0, followLength = 1;
+    int i, j, count = 0;
+    Rules currentRule;
+    Rhs currentRhs, followingRhs;
+    while (prevFollowLength != followLength)
+    {
+        count++;
+        prevFollowLength = followLength;
+        followLength = 0;
+        for (i = 0; i < noofnt; i++)
+        {
+            currentRule = G[i];
+            while (currentRule != NULL)
+            {
+                currentRhs = currentRule->rule;
+                while (currentRhs != NULL)
+                {
+                    if (currentRhs->isTerminal == false)
+                    {
+                        followingRhs = currentRhs->next;
+                        while (1)
+                        {
+                            if (followingRhs == NULL)
+                            {
+                                for (j = 0; j < nooft; j++)
+                                {
+                                    if (Follow[i][j] == '1')
+                                        Follow[currentRhs->type][j] = '1';
+                                }
+                                break;
+                            }
+                            else if (followingRhs->isTerminal && followingRhs->type != EPSILON)
+                            {
+                                Follow[currentRhs->type][followingRhs->type] = '1';
+                                break;
+                            }
+                            else
+                            {
+                                for (j = 0; j < nooft; j++)
+                                {
+                                    if (First[followingRhs->type][j] == '1' && j != EPSILON)
+                                        Follow[currentRhs->type][j] = '1';
+                                }
+                                if (First[followingRhs->type][EPSILON] == '0')
+                                    break;
+                                else
+                                    followingRhs = followingRhs->next;
+                            }
+                        }
+                    }
+                    currentRhs = currentRhs->next;
+                }
+                currentRule = currentRule->next;
+            }
+            for (j = 0; j < nooft; j++)
+            {
+                if (Follow[i][j] == '1')
+                    followLength++;
+            }
+        }
+        //calculate followLength
+    }
+    // for (i = 0; i < noofnt; i++)
+    // followDone[i] = '0';
+    // followDone[mainFunction] = '1';
+    // printf("%d\n", count);
+}
+
+void printFollow(char **Follow)
+{
+    printf("PRINTING FOLLOW SET\n");
+    char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
+    char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
+    int i, j;
+    for (i = 0; i < noofnt; i++)
+    {
+        printf("%s :\n", keys1[i]);
+        for (j = 0; j < nooft; j++)
+        {
+            if (Follow[i][j] == '1')
+                printf("\t %s", keys2[j]);
+        }
+        printf("\n");
+    }
+    return;
+}
+
+Rules **MakeParseTable(Grammer G, char **Follow, char **First)
+{
+    int i, j;
+    Rules **parseTable = (Rules **)calloc(noofnt, sizeof(Rules *));
+    Rules currentRule;
+    Rhs currentRhs;
+    for (i = 0; i < noofnt; i++)
+    {
+        parseTable[i] = (Rules *)calloc(nooft, sizeof(Rules));
+        currentRule = G[i];
+        while (currentRule != NULL)
+        {
+            currentRhs = currentRule->rule;
+            while (1)
+            {
+                if (currentRhs == NULL)
+                {
+                    for (j = 0; j < nooft; j++)
+                    {
+                        if (Follow[i][j] == '1')
+                            parseTable[i][j] = currentRule;
+                    }
+                    break;
+                }
+                else if (currentRhs->isTerminal && currentRhs->type != EPSILON)
+                {
+                    parseTable[i][currentRhs->type] = currentRule;
+                    break;
+                }
+                else if (currentRhs->isTerminal && currentRhs->type == EPSILON)
+                {
+                }
+                else
+                {
+                    for (j = 0; j < nooft; j++)
+                    {
+                        if (First[currentRhs->type][j] == '1')
+                            parseTable[i][j] = currentRule;
+                    }
+                    if (First[currentRhs->type][EPSILON] == '0')
+                        break;
+                }
+                currentRhs = currentRhs->next;
+            }
+            currentRule = currentRule->next;
+        }
+    }
+    return parseTable;
+}
+
+void printParseTable(Rules **parseTable)
+{
+    printf("PRINTING PARSETABLE\n");
+    char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
+    char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
+    int i, j;
+    Rules currentRule;
+    Rhs currentRhs;
+    for (i = 0; i < noofnt; i++)
+    {
+        printf("%s :\n", keys1[i]);
+        for (j = 0; j < nooft; j++)
+        {
+            currentRule = parseTable[i][j];
+            if (currentRule != NULL)
+            {
+                printf("\t %s :", keys2[j]);
+                currentRhs = currentRule->rule;
+                printf("<%s> ==> ", keys1[i]);
+                while (currentRhs != NULL)
+                {
+                    if (currentRhs->isTerminal)
+                        printf("%s ", keys2[currentRhs->type]);
+                    else
+                        printf("<%s> ", keys1[currentRhs->type]);
+                    currentRhs = currentRhs->next;
+                }
+                printf("\n");
+            }
         }
     }
 }
