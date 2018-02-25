@@ -28,20 +28,19 @@ int main(int argc, char **argv)
     }
     else
     {
-        fp = fopen("test", "r");
+        fp = fopen("./testcases/testcase1.txt", "r");
     }
-    fp = getStream(fp, buf);
-    tokenPtr t; // = calloc(1, sizeof(Token));
+    // tokenPtr t; // = calloc(1, sizeof(Token));
     root = FillTrie();
-    while (fp != NULL || buf[bufIndex] != '\0')
-    {
-        t = getNextToken();
-        // printToken(t);
-        free(t);
-    }
+    // while (fp != NULL || buf[bufIndex] != '\0')
+    // {
+    //     t = getNextToken();
+    //     // printToken(t);
+    //     free(t);
+    // }
 
     Grammer G = readGrammer("Grammer.txt");
-    printGrammer(G);
+    // printGrammer(G);
     char **First = (char **)calloc(noofnt, sizeof(char *));
     for (i = 0; i < noofnt; i++)
     {
@@ -50,7 +49,7 @@ int main(int argc, char **argv)
             First[i][j] = '0';
     }
     MakeFirst(G, First);
-    printFirst(First);
+    // printFirst(First);
     char **Follow = (char **)calloc(noofnt, sizeof(char *));
     for (i = 0; i < noofnt; i++)
     {
@@ -59,8 +58,9 @@ int main(int argc, char **argv)
             Follow[i][j] = '0';
     }
     MakeFollow(G, Follow, First);
-    printFollow(Follow);
+    // printFollow(Follow);
     Rules **parseTable = MakeParseTable(G, Follow, First);
-    printParseTable(parseTable);
+    // printParseTable(parseTable);
+    makeParseTree(parseTable);
     return 0;
 }

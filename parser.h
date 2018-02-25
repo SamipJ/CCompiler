@@ -2,6 +2,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 #include "parserDef.h"
+#include <stdio.h>
 Grammer readGrammer(char *fname);
 void printGrammer(Grammer G);
 struct TrieNode *FillTrieforGrammer();
@@ -12,4 +13,5 @@ void MakeFollow(Grammer G, char **Follow, char **First);
 void printFollow(char **Follow);
 Rules **MakeParseTable(Grammer G, char **Follow, char **First);
 void printParseTable(Rules **parseTable);
+void makeParseTree(Rules **parseTable);
 #endif
