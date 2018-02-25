@@ -3,17 +3,20 @@
 #include "Trie.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "parser.h"
 
-int lineNo, bufSize, bufIndex;
+int lineNo, bufSize, bufIndex, noofnt;
 struct TrieNode *root;
 char *buf;
 FILE *fp;
+int strsize;
 
 int main(int argc, char **argv)
 {
     bufSize = 1024;
     lineNo = 1;
     bufIndex = 0;
+    noofnt = 44;
     buf = (char *)calloc(bufSize, sizeof(char));
     if (argc == 2)
     {
@@ -29,9 +32,13 @@ int main(int argc, char **argv)
     while (fp != NULL || buf[bufIndex] != '\0')
     {
         t = getNextToken();
-        printToken(t);
+        // printToken(t);
         free(t);
     }
+
+    Grammer G = readGrammer("Grammer.txt");
+    // printf("hi");
+    printGrammer(G);
     // while (fp != NULL)
     // {
     //     printf("%s", buf);
