@@ -1,7 +1,7 @@
 file
-exe
+exe*
 test*
-output 
+output*
 
 # Prerequisites
 *.d
