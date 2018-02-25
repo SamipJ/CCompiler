@@ -3,7 +3,7 @@
 <moreStmtAndFunctionDefs> ===> <stmtsAndFunctionDefs> | EPSILON
 <stmtOrFunctionDef> ===> <stmt> | <functionDef>
 <stmt> ===> <declarationStmt> | ID ASSIGNOP <assignFuncCallSizeStmt> | <conditionalStmt> | <ioStmt> |  SQO <varList> SQC ASSIGNOP <funcCallSizeStmt> | <funCallStmt>
-<functionDef> ===> FUNCTION SQO <parameterList> SQC ASSIGNOP FUNID SQO <parameterList> SQC <stmtsAndFunctionDefs> END
+<functionDef> ===> FUNCTION SQO <parameterList> SQC ASSIGNOP FUNID SQO <parameterList> SQC <stmtsAndFunctionDefs> END SEMICOLON
 <parameterList> ===> <typevar> ID <remainingList>
 <typevar> ===> INT | REAL | STRING | MATRIX
 <remainingList> ===> COMMA <parameterList> | EPSILON
