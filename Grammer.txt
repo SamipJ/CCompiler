@@ -2,7 +2,7 @@
 <stmtsAndFunctionDefs> ===> <stmtOrFunctionDef> <moreStmtAndFunctionDefs>
 <moreStmtAndFunctionDefs> ===> <stmtsAndFunctionDefs> | EPSILON
 <stmtOrFunctionDef> ===> <stmt> | <functionDef>
-<stmt> ===> <declarationStmt> SEMICOLON | ID ASSIGNOP <assignFuncCallSizeStmt> SEMICOLON | <conditionalStmt> SEMICOLON | <ioStmt> SEMICOLON | SQO <varList> SQC ASSIGNOP <funcCallSizeStmt> SEMICOLON | <funCallStmt>SEMICOLON 
+<stmt> ===> <declarationStmt> SEMICOLON | ID ASSIGNOP <assignFuncCallSizeStmt> SEMICOLON | <conditionalStmt> SEMICOLON | <ioStmt> SEMICOLON | SQO <varList> SQC ASSIGNOP <funcCallSizeStmt> SEMICOLON | <funCallStmt> SEMICOLON 
 <functionDef> ===> FUNCTION SQO <parameterList> SQC ASSIGNOP FUNID SQO <parameterList> SQC <stmtsAndFunctionDefs> END SEMICOLON
 <parameterList> ===> <typevar> ID <remainingList>
 <typevar> ===> INT | REAL | STRING | MATRIX
