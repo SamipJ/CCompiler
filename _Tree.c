@@ -142,6 +142,10 @@ void FileInorderTree(Node n, FILE *fp)
         {
             fprintf(fp, "--------------------\t%-5d\t%-20s\t%-10.2f\t%-20s\tyes\t\t--------------------\n", ((tokenPtr)(n->data))->lineno, keys2[((tokenPtr)(n->data))->type], ((tokenPtr)(n->data))->value, keys1[((Rhs)(n->parent->data))->type]);
         }
+        else if (((tokenPtr)(n->data))->type == EPSILON)
+        {
+            fprintf(fp, "%-20s\t-----\t%-20s\t----------\t%-20s\tyes\t\t--------------------\n", ((tokenPtr)(n->data))->string, keys2[((tokenPtr)(n->data))->type], keys1[((Rhs)(n->parent->data))->type]);
+        }
         else
         {
             fprintf(fp, "%-20s\t%-5d\t%-20s\t----------\t%-20s\tyes\t\t--------------------\n", ((tokenPtr)(n->data))->string, ((tokenPtr)(n->data))->lineno, keys2[((tokenPtr)(n->data))->type], keys1[((Rhs)(n->parent->data))->type]);

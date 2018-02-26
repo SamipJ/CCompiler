@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     // printFollow(Follow);
     Rules **parseTable = MakeParseTable(G, Follow, First);
     // printParseTable(parseTable);
-    Node root = makeParseTree(parseTable);
+    Node root = makeParseTree(parseTable, First, Follow);
     // PrintInorderTree(root);
     if (argc >= 3)
     {

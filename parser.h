@@ -14,5 +14,5 @@ void MakeFollow(Grammer G, char **Follow, char **First);
 void printFollow(char **Follow);
 Rules **MakeParseTable(Grammer G, char **Follow, char **First);
 void printParseTable(Rules **parseTable);
-Node makeParseTree(Rules **parseTable);
+Node makeParseTree(Rules **parseTable, char **First, char **Follow);
 #endif
