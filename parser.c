@@ -8,7 +8,7 @@
 #include "parser.h"
 #include "_Stack.h"
 #include "_Tree.h"
-extern int lineNo, bufSize, bufIndex;
+extern int lineNo, bufSize, bufIndex, flag;
 extern char *buf;
 extern FILE *fp;
 // extern int noofnt;
@@ -462,7 +462,7 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
     Rhs stackPop, stackPush;
     Rules stackPushRule;
     tokenPtr t;
-    int flag;
+    // int flag;
     fp = getStream(fp, buf);
     while (fp != NULL || buf[bufIndex] != '\0' || isEmpty(stackH) != 0)
     {
@@ -498,57 +498,62 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                 if (t->type != stackPop->type)
                 {
                     // printf("ERROR!!1\n");
-                    // printf("line no.: %d Syntax error: The token %s for lexeme %s does not match at line %d. The expected token here is %s\n", t->lineno, keys2[t->type], t->string, t->lineno, keys2[stackPop->type]);
-
-                    // // break;
-                    // continue;
-
-                    while (t->type != SEMICOLON)
-                    {
-                        if (fp != NULL || buf[bufIndex] != '\0' || isEmpty(stackH) != 0)
-                        {
-                            t = getNextToken();
-                            printToken(t);
-                            if (t->type == COMMENT || t->type == ERROR || t->type == NONE)
-                            {
-                                free(t);
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    if (!(stackPop->isTerminal) && stackPop->type == moreStmtAndFunctionDefs)
-                    {
-                        push(stackH, stackPop);
-                    }
+                    if (t->type == NUM)
+                        printf("line no.: %d\t Syntax error: The token %s for lexeme <%d> does not match at line %d. The expected token here is %s\n", t->lineno, keys2[t->type], (int)t->value, t->lineno, keys2[stackPop->type]);
+                    else if (t->type == RNUM)
+                        printf("line no.: %d\t Syntax error: The token %s for lexeme <%.2f> does not match at line %d. The expected token here is %s\n", t->lineno, keys2[t->type], t->value, t->lineno, keys2[stackPop->type]);
                     else
-                    {
-                        while (!(stackPop->isTerminal && stackPop->type == SEMICOLON))
-                        {
-                            if (!isEmpty(stackH))
-                            {
-                                printf("POP: ");
-                                stackPop = pop(stackH);
-                                if (stackPop->isTerminal)
-                                {
-                                    printf("%s\n", keys2[stackPop->type]);
-                                }
-                                else
-                                {
-                                    printf("%s\n", keys1[stackPop->type]);
-                                }
-                                currentNode = nextNT(currentNode);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    break;
+                        printf("line no.: %d\t Syntax error: The token %s for lexeme <%s> does not match at line %d. The expected token here is %s\n", t->lineno, keys2[t->type], t->string, t->lineno, keys2[stackPop->type]);
+                    flag = 1;
+                    // // break;
+                    continue;
+
+                    // while (t->type != SEMICOLON)
+                    // {
+                    //     if (fp != NULL || buf[bufIndex] != '\0' || isEmpty(stackH) != 0)
+                    //     {
+                    //         t = getNextToken();
+                    //         printToken(t);
+                    //         if (t->type == COMMENT || t->type == ERROR || t->type == NONE)
+                    //         {
+                    //             free(t);
+                    //             continue;
+                    //         }
+                    //     }
+                    //     else
+                    //     {
+                    //         break;
+                    //     }
+                    // }
+                    // if (!(stackPop->isTerminal) && stackPop->type == moreStmtAndFunctionDefs)
+                    // {
+                    //     push(stackH, stackPop);
+                    // }
+                    // else
+                    // {
+                    //     while (!(stackPop->isTerminal && stackPop->type == SEMICOLON))
+                    //     {
+                    //         if (!isEmpty(stackH))
+                    //         {
+                    //             printf("POP: ");
+                    //             stackPop = pop(stackH);
+                    //             if (stackPop->isTerminal)
+                    //             {
+                    //                 printf("%s\n", keys2[stackPop->type]);
+                    //             }
+                    //             else
+                    //             {
+                    //                 printf("%s\n", keys1[stackPop->type]);
+                    //             }
+                    //             currentNode = nextNT(currentNode);
+                    //         }
+                    //         else
+                    //         {
+                    //             break;
+                    //         }
+                    //     }
+                    // }
+                    // break;
                 }
                 else
                 {
@@ -610,14 +615,16 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                 }
                 else
                 {
-                    printf("ERROR!!2\n");
+                    // printf("ERROR!!2\n");
                     // flag = 0;
+                    printf("line no.: %d\t Syntax error: Skiping Parsing Till SEMICOLON on line ", t->lineno);
+                    flag = 1;
                     while (t->type != SEMICOLON)
                     {
                         if (fp != NULL || buf[bufIndex] != '\0' || isEmpty(stackH) != 0)
                         {
                             t = getNextToken();
-                            printToken(t);
+                            // printToken(t);
                             if (t->type == COMMENT || t->type == ERROR || t->type == NONE)
                             {
                                 free(t);
@@ -639,16 +646,16 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                         {
                             if (!isEmpty(stackH))
                             {
-                                printf("POP: ");
+                                // printf("POP: ");
                                 stackPop = pop(stackH);
-                                if (stackPop->isTerminal)
-                                {
-                                    printf("%s\n", keys2[stackPop->type]);
-                                }
-                                else
-                                {
-                                    printf("%s\n", keys1[stackPop->type]);
-                                }
+                                // if (stackPop->isTerminal)
+                                // {
+                                //     printf("%s\n", keys2[stackPop->type]);
+                                // }
+                                // else
+                                // {
+                                //     printf("%s\n", keys1[stackPop->type]);
+                                // }
                                 currentNode = nextNT(currentNode);
                             }
                             else
@@ -657,6 +664,7 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                             }
                         }
                     }
+                    printf("%d\n", t->lineno);
                     break;
                     // while (1)
                     // {

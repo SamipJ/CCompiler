@@ -11,7 +11,7 @@ struct TrieNode *root;
 char *buf;
 FILE *fp;
 int strsize;
-int flag;
+int flag = 0;
 
 int main(int argc, char **argv)
 {
@@ -84,7 +84,10 @@ int main(int argc, char **argv)
         //     fileout = fopen("./parsetreeoutfile.txt", "w+");
         // }
         // FileInorderTree(root, fileout);
-        printf("COMPILATION COMPLETE\n");
+        if (flag == 0)
+            printf("COMPILED SUCCESSFULLY\n");
+        else
+            printf("COMPILATION FAILED\n");
     }
     else if (option == 4)
     {
@@ -123,6 +126,10 @@ int main(int argc, char **argv)
         }
         FileInorderTree(root, fileout);
         fclose(fileout);
+        if (flag == 0)
+            printf("COMPILED SUCCESSFULLY\n");
+        else
+            printf("COMPILATION FAILED\n");
     }
     else
     {

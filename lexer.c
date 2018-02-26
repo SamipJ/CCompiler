@@ -11,7 +11,7 @@ extern int lineNo, bufSize, bufIndex;
 extern char *buf;
 extern FILE *fp;
 extern struct TrieNode *root;
-extern int strsize;
+extern int strsize, flag;
 
 FILE *getStream(FILE *fp, char *buf)
 {
@@ -232,7 +232,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             {
                 state = -1;
                 tokenp->type = ERROR;
-                printf("line no.: %d Lexical error: Unknown symbol-  %c ascii value- %d\n", lineNo, c, (int)c);
+                printf("line no.: %d\t Lexical error: Unknown symbol-  %c ascii value- %d\n", lineNo, c, (int)c);
                 tokenp->lineno = lineNo;
                 bufIndex++;
             }
@@ -283,7 +283,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern '=/%c'\n", lineNo, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern '=/%c'\n", lineNo, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
         }
@@ -319,13 +319,13 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern '_%c'\n", lineNo, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern '_%c'\n", lineNo, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
         }
         break;
     case 5:
-        if (isalnum(c) && strsize < 20)
+        if (isalnum(c))
         {
             tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
             strsize++;
@@ -334,13 +334,13 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             bufIndex++;
             break;
         }
-        else if (isalnum(c) && strsize >= 20)
-        {
-            state = -1;
-            tokenp->type = ERROR;
-            printf("line no.: %d Lexical error : Identifier is longer than the prescribed length %s%c...\n", lineNo, tokenp->string, c);
-            tokenp->lineno = lineNo;
-        }
+        // else if (isalnum(c) && strsize >= 20)
+        // {
+        //     state = -1;
+        //     tokenp->type = ERROR;
+        //     printf("line no.: %d\t Lexical error : Identifier is longer than the prescribed length %s%c...\n", lineNo, tokenp->string, c);
+        //     tokenp->lineno = lineNo;
+        // }
         else
         {
             state = -1;
@@ -353,13 +353,23 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             }
             else
             {
-                tokenp->type = FUNID;
-                tokenp->lineno = lineNo;
+                if (strsize > 20)
+                {
+                    state = -1;
+                    tokenp->type = ERROR;
+                    printf("line no.: %d\t Lexical error : Identifier is longer than the prescribed length <%s>\n", lineNo, tokenp->string);
+                    tokenp->lineno = lineNo;
+                }
+                else
+                {
+                    tokenp->type = FUNID;
+                    tokenp->lineno = lineNo;
+                }
             }
             break;
         }
     case 6:
-        if (isalpha(c) && strsize < 20)
+        if (isalpha(c))
         {
             tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
             tokenp->string[strlen(tokenp->string) + 1] = '\0';
@@ -368,38 +378,55 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             bufIndex++;
             break;
         }
-        else if (isdigit(c) && strsize < 20)
+        else if (isdigit(c))
         {
             state = -1;
             tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
             tokenp->string[strlen(tokenp->string) + 1] = '\0';
             tokenp->string[strlen(tokenp->string)] = c;
             bufIndex++;
+            strsize++;
+            if (strsize > 20)
+            {
+                state = -1;
+                tokenp->type = ERROR;
+                printf("line no.: %d\t Lexical error : Identifier is longer than the prescribed length <%s>\n", lineNo, tokenp->string);
+                tokenp->lineno = lineNo;
+            }
             tokenp->type = ID;
-            strsize++;
             tokenp->lineno = lineNo;
             break;
         }
-        else if (isalnum(c) && strsize >= 20)
-        {
-            state = -1;
-            tokenp->type = ERROR;
-            printf("line no.: %d Lexical error : Identifier is longer than the prescribed length %s%c...\n", lineNo, tokenp->string, c);
-            tokenp->lineno = lineNo;
-            break;
-        }
+        // else if (isalnum(c) && strsize >= 20)
+        // {
+        //     state = -1;
+        //     tokenp->type = ERROR;
+        //     printf("line no.: %d\t Lexical error : Identifier is longer than the prescribed length %s%c...\n", lineNo, tokenp->string, c);
+        //     tokenp->lineno = lineNo;
+        //     break;
+        // }
         else
         {
-            tokenp->type = ID;
-            // LOOKUPTABLE
-            type = search(root, tokenp->string);
-            if (type != 0)
+            if (strsize > 20)
             {
-                tokenp->type = type;
-                // free(tokenp->string);
-                // tokenp->string = NULL;
+                state = -1;
+                tokenp->type = ERROR;
+                printf("line no.: %d\t Lexical error : Identifier is longer than the prescribed length <%s>\n", lineNo, tokenp->string);
+                tokenp->lineno = lineNo;
             }
-            tokenp->lineno = lineNo;
+            else
+            {
+                tokenp->type = ID;
+                // LOOKUPTABLE
+                type = search(root, tokenp->string);
+                if (type != 0)
+                {
+                    tokenp->type = type;
+                    // free(tokenp->string);
+                    // tokenp->string = NULL;
+                }
+                tokenp->lineno = lineNo;
+            }
             break;
         }
     case 7:
@@ -431,7 +458,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern '%d.%c'\n", lineNo, (int)tokenp->value, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern '%d.%c'\n", lineNo, (int)tokenp->value, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
         }
@@ -449,13 +476,13 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern '%.1f%c'\n", lineNo, tokenp->value, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern '%.1f%c'\n", lineNo, tokenp->value, c);
             tokenp->lineno = lineNo;
             bufIndex++;
         }
         break;
     case 10:
-        if (isalpha(c) || c == ' ')
+        if (islower(c) || c == ' ')
         {
             state = 11;
             tokenp->string = calloc(3, sizeof(char));
@@ -469,12 +496,12 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern \"%c\n", lineNo, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern \"%c\n", lineNo, c);
             tokenp->lineno = lineNo;
         }
         break;
     case 11:
-        if ((isalpha(c) || c == ' ') && strsize < 19)
+        if ((islower(c) || c == ' '))
         {
             tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
             tokenp->string[strlen(tokenp->string) + 1] = '\0';
@@ -482,15 +509,25 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             strsize++;
             bufIndex++;
         }
-        else if (c == '"' && strsize < 20)
+        else if (c == '"')
         {
             tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
             tokenp->string[strlen(tokenp->string) + 1] = '\0';
             tokenp->string[strlen(tokenp->string)] = c;
             bufIndex++;
             strsize++;
-            tokenp->type = STR;
-            tokenp->lineno = lineNo;
+            if (strsize > 20)
+            {
+                state = -1;
+                tokenp->type = ERROR;
+                printf("line no.: %d\t Lexical error : Identifier is longer than the prescribed length <%s>\n", lineNo, tokenp->string);
+                tokenp->lineno = lineNo;
+            }
+            else
+            {
+                tokenp->type = STR;
+                tokenp->lineno = lineNo;
+            }
             state = -1;
         }
         else
@@ -498,9 +535,9 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             state = -1;
             tokenp->type = ERROR;
             if (strsize < 20)
-                printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
+                printf("line no.: %d\t Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             else
-                printf("line no.: %d Lexical error: String longer than the prescribed length %s\n", lineNo, tokenp->string);
+                printf("line no.: %d\t Lexical error: String longer than the prescribed length <%s>\n", lineNo, tokenp->string);
             tokenp->lineno = lineNo;
             // bufIndex++;
         }
@@ -587,7 +624,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern '.%c'\n", lineNo, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern '.%c'\n", lineNo, c);
 
             tokenp->lineno = lineNo;
             // bufIndex++;
@@ -607,7 +644,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -626,7 +663,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -653,7 +690,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         else
         {
             state = -1;
-            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
             // bufIndex++;
@@ -673,7 +710,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -700,7 +737,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -719,7 +756,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -738,7 +775,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -764,7 +801,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
-            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
+            printf("line no.: %d\t Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -794,6 +831,7 @@ tokenPtr getNextToken()
 
         if (tokenp->type == ERROR)
         {
+            flag = 1;
             free(tokenp);
             state = 0;
             tokenp = (tokenPtr)calloc(1, sizeof(Token));
