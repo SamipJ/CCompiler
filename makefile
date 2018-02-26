@@ -1,11 +1,11 @@
 run : linkall
-	./exe ./testcases/testcase1.txt ./parsetreeoutfile.txt
+	./stage1exe ./testcases/testcase1.txt ./parsetreeoutfile.txt
 
 linkall: driver
-	gcc lexer.o _Tree.o _Trie.o _Stack.o parser.o driver.o -o exe
+	gcc lexer.o _Tree.o _Trie.o _Stack.o parser.o driver.o -o stage1exe
 
 gdb : linkall
-	gdb exe
+	gdb stage1exe
 
 driver: lexer parser driver.c
 	gcc -c -g driver.c
@@ -20,4 +20,4 @@ parser: lexer _Stack.c _Stack.h _Tree.c _Tree.h
 	gcc -c -g _Tree.c
 
 clean:
-	rm *.o exe output* a.out
+	rm *.o exe output* a.out stage1exe

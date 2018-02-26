@@ -47,6 +47,11 @@ FILE *getStream(FILE *fp, char *buf)
 
 int getNextState(tokenPtr tokenp, int currentstate, char c)
 {
+    // printf("%d", lineNo);
+    // if (lineNo == 28)
+    // {
+    //     printf("hi\n");
+    // }
     int state, type;
     switch (currentstate)
     {
@@ -64,6 +69,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
 
         case '_':
             state = 4;
+            strsize = 1;
             bufIndex++;
             break;
         case '"':
@@ -197,6 +203,9 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             break;
         case '.':
             state = 14;
+            tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[0] = '.';
+            tokenp->string[1] = '\0';
             bufIndex++;
             break;
         case 0:
@@ -211,6 +220,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
                 tokenp->string = calloc(2, sizeof(char));
                 tokenp->string[1] = '\0';
                 tokenp->string[0] = c;
+                strsize = 1;
             }
             else if (isdigit(c))
             {
@@ -222,6 +232,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             {
                 state = -1;
                 tokenp->type = ERROR;
+                printf("line no.: %d Lexical error: Unknown symbol-  %c ascii value- %d\n", lineNo, c, (int)c);
                 tokenp->lineno = lineNo;
                 bufIndex++;
             }
@@ -272,6 +283,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern '=/%c'\n", lineNo, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
         }
@@ -299,6 +311,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             tokenp->string = calloc(3, sizeof(char));
             tokenp->string[0] = '_';
             tokenp->string[1] = c;
+            strsize++;
             tokenp->string[2] = '\0';
             bufIndex++;
         }
@@ -306,18 +319,27 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern '_%c'\n", lineNo, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
         }
         break;
     case 5:
-        if (isalnum(c))
+        if (isalnum(c) && strsize < 20)
         {
             tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
+            strsize++;
             tokenp->string[strlen(tokenp->string) + 1] = '\0';
             tokenp->string[strlen(tokenp->string)] = c;
             bufIndex++;
             break;
+        }
+        else if (isalnum(c) && strsize >= 20)
+        {
+            state = -1;
+            tokenp->type = ERROR;
+            printf("line no.: %d Lexical error : Identifier is longer than the prescribed length %s%c...\n", lineNo, tokenp->string, c);
+            tokenp->lineno = lineNo;
         }
         else
         {
@@ -337,15 +359,16 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             break;
         }
     case 6:
-        if (isalpha(c))
+        if (isalpha(c) && strsize < 20)
         {
             tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
             tokenp->string[strlen(tokenp->string) + 1] = '\0';
             tokenp->string[strlen(tokenp->string)] = c;
+            strsize++;
             bufIndex++;
             break;
         }
-        else if (isdigit(c))
+        else if (isdigit(c) && strsize < 20)
         {
             state = -1;
             tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
@@ -353,6 +376,15 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
             tokenp->string[strlen(tokenp->string)] = c;
             bufIndex++;
             tokenp->type = ID;
+            strsize++;
+            tokenp->lineno = lineNo;
+            break;
+        }
+        else if (isalnum(c) && strsize >= 20)
+        {
+            state = -1;
+            tokenp->type = ERROR;
+            printf("line no.: %d Lexical error : Identifier is longer than the prescribed length %s%c...\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             break;
         }
@@ -399,6 +431,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern '%d.%c'\n", lineNo, (int)tokenp->value, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
         }
@@ -416,6 +449,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern '%.1f%c'\n", lineNo, tokenp->value, c);
             tokenp->lineno = lineNo;
             bufIndex++;
         }
@@ -435,6 +469,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern \"%c\n", lineNo, c);
             tokenp->lineno = lineNo;
         }
         break;
@@ -462,6 +497,10 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            if (strsize < 20)
+                printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
+            else
+                printf("line no.: %d Lexical error: String longer than the prescribed length %s\n", lineNo, tokenp->string);
             tokenp->lineno = lineNo;
             // bufIndex++;
         }
@@ -517,18 +556,30 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         if (c == 'a')
         {
             state = 15;
+            tokenp->string = realloc(tokenp->string, 3 * sizeof(char));
+            // tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = 'a';
+            tokenp->string[2] = '\0';
             bufIndex++;
             break;
         }
         else if (c == 'o')
         {
             state = 18;
+            // tokenp->string = calloc(2, sizeof(char));
+            tokenp->string = realloc(tokenp->string, 3 * sizeof(char));
+            tokenp->string[1] = 'o';
+            tokenp->string[2] = '\0';
             bufIndex++;
             break;
         }
         else if (c == 'n')
         {
             state = 20;
+            tokenp->string = realloc(tokenp->string, 3 * sizeof(char));
+            // tokenp->string = calloc(2, sizeof(char));
+            tokenp->string[1] = 'n';
+            tokenp->string[2] = '\0';
             bufIndex++;
             break;
         }
@@ -536,6 +587,8 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern '.%c'\n", lineNo, c);
+
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -544,6 +597,9 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         if (c == 'n')
         {
             state = 16;
+            tokenp->string = realloc(tokenp->string, 4 * sizeof(char));
+            tokenp->string[2] = 'n';
+            tokenp->string[3] = '\0';
             bufIndex++;
             break;
         }
@@ -551,6 +607,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -559,6 +616,9 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         if (c == 'd')
         {
             state = 17;
+            tokenp->string = realloc(tokenp->string, 5 * sizeof(char));
+            tokenp->string[3] = 'd';
+            tokenp->string[4] = '\0';
             bufIndex++;
             break;
         }
@@ -566,6 +626,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -575,13 +636,16 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = AND;
-            tokenp->string = calloc(6, sizeof(char));
-            tokenp->string[0] = '.';
-            tokenp->string[1] = 'a';
-            tokenp->string[2] = 'n';
-            tokenp->string[3] = 'd';
+            tokenp->string = realloc(tokenp->string, 6 * sizeof(char));
             tokenp->string[4] = '.';
             tokenp->string[5] = '\0';
+            // tokenp->string = calloc(6, sizeof(char));
+            // tokenp->string[0] = '.';
+            // tokenp->string[1] = 'a';
+            // tokenp->string[2] = 'n';
+            // tokenp->string[3] = 'd';
+            // tokenp->string[4] = '.';
+            // tokenp->string[5] = '\0';
             tokenp->lineno = lineNo;
             bufIndex++;
             break;
@@ -589,6 +653,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         else
         {
             state = -1;
+            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->type = ERROR;
             tokenp->lineno = lineNo;
             // bufIndex++;
@@ -598,6 +663,9 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         if (c == 'r')
         {
             state = 19;
+            tokenp->string = realloc(tokenp->string, 4 * sizeof(char));
+            tokenp->string[2] = 'r';
+            tokenp->string[3] = '\0';
             bufIndex++;
             break;
         }
@@ -605,6 +673,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -614,12 +683,15 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = OR;
-            tokenp->string = calloc(5, sizeof(char));
-            tokenp->string[0] = '.';
-            tokenp->string[1] = 'o';
-            tokenp->string[2] = 'r';
+            tokenp->string = realloc(tokenp->string, 5 * sizeof(char));
             tokenp->string[3] = '.';
             tokenp->string[4] = '\0';
+            // tokenp->string = calloc(5, sizeof(char));
+            // tokenp->string[0] = '.';
+            // tokenp->string[1] = 'o';
+            // tokenp->string[2] = 'r';
+            // tokenp->string[3] = '.';
+            // tokenp->string[4] = '\0';
             tokenp->lineno = lineNo;
             bufIndex++;
             break;
@@ -628,6 +700,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -636,6 +709,9 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         if (c == 'o')
         {
             state = 21;
+            tokenp->string = realloc(tokenp->string, 4 * sizeof(char));
+            tokenp->string[2] = 'o';
+            tokenp->string[3] = '\0';
             bufIndex++;
             break;
         }
@@ -643,14 +719,18 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
         }
     case 21:
-        if (c == 'd')
+        if (c == 't')
         {
             state = 22;
+            tokenp->string = realloc(tokenp->string, 5 * sizeof(char));
+            tokenp->string[3] = 't';
+            tokenp->string[4] = '\0';
             bufIndex++;
             break;
         }
@@ -658,6 +738,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -667,11 +748,12 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = NOT;
-            tokenp->string = calloc(6, sizeof(char));
-            tokenp->string[0] = '.';
-            tokenp->string[1] = 'n';
-            tokenp->string[2] = 'o';
-            tokenp->string[3] = 't';
+            tokenp->string = realloc(tokenp->string, 6 * sizeof(char));
+            // tokenp->string = calloc(6, sizeof(char));
+            // tokenp->string[0] = '.';
+            // tokenp->string[1] = 'n';
+            // tokenp->string[2] = 'o';
+            // tokenp->string[3] = 't';
             tokenp->string[4] = '.';
             tokenp->string[5] = '\0';
             tokenp->lineno = lineNo;
@@ -682,6 +764,7 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         {
             state = -1;
             tokenp->type = ERROR;
+            printf("line no.: %d Lexical error: Unknown pattern %s%c\n", lineNo, tokenp->string, c);
             tokenp->lineno = lineNo;
             // bufIndex++;
             break;
@@ -698,10 +781,22 @@ tokenPtr getNextToken()
     while (bufIndex < bufSize - 1 && buf[bufIndex] != '\0')
     {
         state = getNextState(tokenp, state, buf[bufIndex]);
+        // if (state == -1)
+        // {
+        //     // state = 0;
+        //     continue;
+        // }
         if (bufIndex == bufSize - 1)
         {
             bufIndex = 0;
             fp = getStream(fp, buf);
+        }
+
+        if (tokenp->type == COMMENT || tokenp->type == ERROR)
+        {
+            free(tokenp);
+            state = 0;
+            tokenp = (tokenPtr)calloc(1, sizeof(Token));
         }
         if (tokenp->type != NONE)
         {
@@ -726,7 +821,7 @@ struct TrieNode *FillTrie()
 {
     char keys[][11] = {"end", "int", "real", "string", "matrix",
                        "if", "else", "endif", "read", "print", "function"};
-    int type[11] = {END, INT, REAL, STRING, MATRIX, IF, ELSE, ENDIF, REAL, PRINT, FUNCTION};
+    int type[11] = {END, INT, REAL, STRING, MATRIX, IF, ELSE, ENDIF, READ, PRINT, FUNCTION};
     int i;
     struct TrieNode *root = getNode();
 
@@ -758,6 +853,10 @@ void printToken(tokenPtr t)
     {
         printf("TOKEN: %s LINENO: %d VALUE: %.2f\n", typeTok[t->type], t->lineno, t->value);
     }
+    else if (t->type == FINISH)
+    {
+        return;
+    }
     else //if (t->type == STR)
     {
         printf("TOKEN: %s LINENO: %d VALUE: %s\n", typeTok[t->type], t->lineno, t->string);
@@ -774,4 +873,49 @@ void printToken(tokenPtr t)
     // {
     //     printf("TOKEN: %s LINENO: %d\n", typeTok[t->type], t->lineno);
     // }
+}
+
+void CommentFree()
+{
+    fp = getStream(fp, buf);
+    int flag = 0;
+    while (bufIndex < bufSize - 1 && buf[bufIndex] != '\0')
+    {
+        if (bufIndex == bufSize - 1)
+        {
+            bufIndex = 0;
+            fp = getStream(fp, buf);
+        }
+        if (flag == 0)
+        {
+            if (buf[bufIndex] == '#')
+            {
+                flag = 1;
+                bufIndex++;
+                continue;
+            }
+            else
+            {
+                if (buf[bufIndex] != '\t')
+                    printf("%c", buf[bufIndex]);
+                bufIndex++;
+                continue;
+            }
+        }
+        else if (flag == 1)
+        {
+            if (buf[bufIndex] == '\n')
+            {
+                flag = 0;
+                // printf("\n");
+                bufIndex++;
+                continue;
+            }
+            else
+            {
+                bufIndex++;
+                continue;
+            }
+        }
+    }
 }
