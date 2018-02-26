@@ -792,7 +792,7 @@ tokenPtr getNextToken()
             fp = getStream(fp, buf);
         }
 
-        if (tokenp->type == COMMENT || tokenp->type == ERROR)
+        if (tokenp->type == ERROR)
         {
             free(tokenp);
             state = 0;

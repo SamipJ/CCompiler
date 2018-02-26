@@ -1,3 +1,5 @@
+# SAMIP JASANI 2015A7PS0127P
+
 run : linkall
 	./stage1exe ./testcases/testcase1.txt ./parsetreeoutfile.txt
 
@@ -20,4 +22,4 @@ parser: lexer _Stack.c _Stack.h _Tree.c _Tree.h
 	gcc -c -g _Tree.c
 
 clean:
-	rm *.o exe output* a.out stage1exe
+	rm *.o exe output* a.out stage1exe parsetreeoutfile*
