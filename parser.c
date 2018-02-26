@@ -225,8 +225,8 @@ void FirstDAC(Grammer G, char **First, char *firstDone, int key)
                     {
                         if (First[currentRhs->type][i] == '1' && i != EPSILON)
                         {
-                            if (i == 14)
-                                printf("hi");
+                            // if (i == 14)
+                            //     printf("hi");
                             First[key][i] = '1';
                         }
                     }
@@ -464,7 +464,7 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
     tokenPtr t;
     int flag;
     fp = getStream(fp, buf);
-    while (fp != NULL || buf[bufIndex] != '\0' || isEmpty(stackH) == 0)
+    while (fp != NULL || buf[bufIndex] != '\0' || isEmpty(stackH) != 0)
     {
         // printf("////////////////////////////\n");
         // PrintInorderTree(root);
@@ -487,7 +487,7 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
             else
             {
                 printf("EMPTY STACK\n");
-                break;
+                return NULL;
             }
             if (stackPop->isTerminal)
             {
@@ -498,9 +498,57 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                 if (t->type != stackPop->type)
                 {
                     // printf("ERROR!!1\n");
-                    printf("line no.: %d Syntax error: The token %s for lexeme %s does not match at line %d. The expected token here is %s\n", t->lineno, keys2[t->type], t->string, t->lineno, keys2[stackPop->type]);
-                    // break;
-                    continue;
+                    // printf("line no.: %d Syntax error: The token %s for lexeme %s does not match at line %d. The expected token here is %s\n", t->lineno, keys2[t->type], t->string, t->lineno, keys2[stackPop->type]);
+
+                    // // break;
+                    // continue;
+
+                    while (t->type != SEMICOLON)
+                    {
+                        if (fp != NULL || buf[bufIndex] != '\0' || isEmpty(stackH) != 0)
+                        {
+                            t = getNextToken();
+                            printToken(t);
+                            if (t->type == COMMENT || t->type == ERROR || t->type == NONE)
+                            {
+                                free(t);
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (!(stackPop->isTerminal) && stackPop->type == moreStmtAndFunctionDefs)
+                    {
+                        push(stackH, stackPop);
+                    }
+                    else
+                    {
+                        while (!(stackPop->isTerminal && stackPop->type == SEMICOLON))
+                        {
+                            if (!isEmpty(stackH))
+                            {
+                                printf("POP: ");
+                                stackPop = pop(stackH);
+                                if (stackPop->isTerminal)
+                                {
+                                    printf("%s\n", keys2[stackPop->type]);
+                                }
+                                else
+                                {
+                                    printf("%s\n", keys1[stackPop->type]);
+                                }
+                                currentNode = nextNT(currentNode);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    break;
                 }
                 else
                 {
@@ -563,63 +611,109 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                 else
                 {
                     printf("ERROR!!2\n");
-                    flag = 0;
-                    while (1)
+                    // flag = 0;
+                    while (t->type != SEMICOLON)
                     {
-                        t = getNextToken();
-                        if (t->type == COMMENT || t->type == ERROR || t->type == NONE)
+                        if (fp != NULL || buf[bufIndex] != '\0' || isEmpty(stackH) != 0)
                         {
-                            free(t);
-                            continue;
-                        }
-                        if (t->type == FINISH)
-                        {
-                            break;
-                        }
-                        if (Follow[stackPop->type][t->type] == '1')
-                        {
-                            // flag = 1;
-                            break;
-                        }
-                        else if (First[stackPop->type][t->type] == '1')
-                        {
-                            stackPushRule = parseTable[stackPop->type][t->type];
-
-                            // free(stackPop);
-                            if (stackPushRule != NULL)
+                            t = getNextToken();
+                            printToken(t);
+                            if (t->type == COMMENT || t->type == ERROR || t->type == NONE)
                             {
-                                stackPush = stackPushRule->rule;
-                                while (stackPush != NULL && ((stackPush->type != EPSILON && stackPush->isTerminal) || (!stackPush->isTerminal)))
-                                {
-                                    push(revStack, stackPush);
-                                    currentNode = add_child(currentNode, stackPush, stackPush->isTerminal);
-                                    stackPush = stackPush->next;
-                                }
-                                if (stackPush != NULL && (stackPush->type == EPSILON && stackPush->isTerminal))
-                                {
-                                    currentNode->data = stackPush;
-                                    currentNode->isterminal = true;
-                                    currentNode = nextNT(currentNode);
-                                }
-                                else
-                                {
-                                    currentNode = currentNode->child;
-                                    while (!isEmpty(revStack))
-                                    {
-                                        push(stackH, pop(revStack));
-                                    }
-                                }
+                                free(t);
+                                continue;
                             }
                         }
-                        else if (First[stackPop->type][EPSILON] = '1')
+                        else
                         {
-                            // if (!isEmpty(stackH))
-                            // {
-                            //     stackPop = pop(stackH);
-                            // }
                             break;
                         }
                     }
+                    if (!(stackPop->isTerminal) && stackPop->type == moreStmtAndFunctionDefs)
+                    {
+                        push(stackH, stackPop);
+                    }
+                    else
+                    {
+                        while (!(stackPop->isTerminal && stackPop->type == SEMICOLON))
+                        {
+                            if (!isEmpty(stackH))
+                            {
+                                printf("POP: ");
+                                stackPop = pop(stackH);
+                                if (stackPop->isTerminal)
+                                {
+                                    printf("%s\n", keys2[stackPop->type]);
+                                }
+                                else
+                                {
+                                    printf("%s\n", keys1[stackPop->type]);
+                                }
+                                currentNode = nextNT(currentNode);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                    // while (1)
+                    // {
+                    //     t = getNextToken();
+                    //     if (t->type == COMMENT || t->type == ERROR || t->type == NONE)
+                    //     {
+                    //         free(t);
+                    //         continue;
+                    //     }
+                    //     if (t->type == FINISH)
+                    //     {
+                    //         break;
+                    //     }
+                    //     if (Follow[stackPop->type][t->type] == '1')
+                    //     {
+                    //         // flag = 1;
+                    //         break;
+                    //     }
+                    //     else if (First[stackPop->type][t->type] == '1')
+                    //     {
+                    //         stackPushRule = parseTable[stackPop->type][t->type];
+
+                    //         // free(stackPop);
+                    //         if (stackPushRule != NULL)
+                    //         {
+                    //             stackPush = stackPushRule->rule;
+                    //             while (stackPush != NULL && ((stackPush->type != EPSILON && stackPush->isTerminal) || (!stackPush->isTerminal)))
+                    //             {
+                    //                 push(revStack, stackPush);
+                    //                 currentNode = add_child(currentNode, stackPush, stackPush->isTerminal);
+                    //                 stackPush = stackPush->next;
+                    //             }
+                    //             if (stackPush != NULL && (stackPush->type == EPSILON && stackPush->isTerminal))
+                    //             {
+                    //                 currentNode->data = stackPush;
+                    //                 currentNode->isterminal = true;
+                    //                 currentNode = nextNT(currentNode);
+                    //             }
+                    //             else
+                    //             {
+                    //                 currentNode = currentNode->child;
+                    //                 while (!isEmpty(revStack))
+                    //                 {
+                    //                     push(stackH, pop(revStack));
+                    //                 }
+                    //             }
+                    //         }
+                    //     }
+                    //     else if (First[stackPop->type][EPSILON] = '1')
+                    //     {
+                    //         // if (!isEmpty(stackH))
+                    //         // {
+                    //         //     stackPop = pop(stackH);
+                    //         // }
+                    //         break;
+                    //     }
+                    // }
                     // if (flag == 1)
                     // continue;
                     // break;

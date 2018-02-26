@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     tokenPtr t;
     // noofnt = 44;
     // nooft = 43;
-    printf(" (a) FIRST and FOLLOW set automated \n (b) Both lexical and syntax analysis modules implemented\n\n");
+    printf(" (a) FIRST and FOLLOW set automated \n (b) Both lexical and syntax analysis modules implemented\n (c) Runs on all testcases\n\n");
     printf("Press Option for the defined task: \n 1. for print comment free code \n 2. print token list by lexer \n 3. Parsing of Source Code \n 4. Parsing and Printing Parse Tree\n >> ");
     scanf("%d", &option);
     buf = (char *)calloc(bufSize, sizeof(char));

@@ -2,26 +2,26 @@
 <stmtsAndFunctionDefs> ===> <stmtOrFunctionDef> <moreStmtAndFunctionDefs>
 <moreStmtAndFunctionDefs> ===> <stmtsAndFunctionDefs> | EPSILON
 <stmtOrFunctionDef> ===> <stmt> | <functionDef>
-<stmt> ===> <declarationStmt> | ID ASSIGNOP <assignFuncCallSizeStmt> | <conditionalStmt> | <ioStmt> |  SQO <varList> SQC ASSIGNOP <funcCallSizeStmt> | <funCallStmt>
+<stmt> ===> <declarationStmt> SEMICOLON | ID ASSIGNOP <assignFuncCallSizeStmt> SEMICOLON | <conditionalStmt> SEMICOLON | <ioStmt> SEMICOLON | SQO <varList> SQC ASSIGNOP <funcCallSizeStmt> SEMICOLON | <funCallStmt>SEMICOLON 
 <functionDef> ===> FUNCTION SQO <parameterList> SQC ASSIGNOP FUNID SQO <parameterList> SQC <stmtsAndFunctionDefs> END SEMICOLON
 <parameterList> ===> <typevar> ID <remainingList>
 <typevar> ===> INT | REAL | STRING | MATRIX
 <remainingList> ===> COMMA <parameterList> | EPSILON
-<declarationStmt> ===> <typevar> <varList> SEMICOLON
+<declarationStmt> ===> <typevar> <varList> 
 <varList> ===> ID <moreIds>
 <moreIds> ===> COMMA <varList> | EPSILON
 <assignFuncCallSizeStmt> ===> <assignmentStmt> | <funcCallSizeStmt>
 <funcCallSizeStmt> ===> <funCallStmt> | <sizeStmt>
-<sizeStmt> ===> SIZE ID SEMICOLON
-<conditionalStmt> ===> IF <booleanExpression> <stmt> <otherStmts> <elseStmt> ENDIF
+<sizeStmt> ===> SIZE ID 
+<conditionalStmt> ===> IF <booleanExpression> <stmt> <otherStmts> <elseStmt> ENDIF 
 <otherStmts> ===> <stmt> <otherStmts> | EPSILON
 <elseStmt> ===> ELSE <stmt> <otherStmts> | EPSILON
-<ioStmt> ===> READ OP ID CL SEMICOLON | PRINT OP ID CL SEMICOLON
-<funCallStmt> ===> FUNID OP <emptyOrInputParameterList> CL SEMICOLON 
+<ioStmt> ===> READ OP ID CL | PRINT OP ID CL 
+<funCallStmt> ===> FUNID OP <emptyOrInputParameterList> CL 
 <emptyOrInputParameterList> ===> <inputParameterList> | EPSILON
 <inputParameterList> ===> <var> <listVar> 
 <listVar> ===> COMMA <inputParameterList> | EPSILON
-<assignmentStmt> ===> <arithmeticExpression> SEMICOLON  
+<assignmentStmt> ===> <arithmeticExpression> 
 <arithmeticExpression> ===> <arithmeticExpression2> <arithmeticExpression1>
 <arithmeticExpression1> ===> <operatorplusminus> <arithmeticExpression> | EPSILON
 <arithmeticExpression2> ===> <varExpression> <arithmeticExpression3>
