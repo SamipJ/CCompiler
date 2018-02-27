@@ -600,8 +600,10 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                     }
                     if (stackPush != NULL && (stackPush->type == EPSILON && stackPush->isTerminal))
                     {
-                        currentNode->data = stackPush;
-                        currentNode->isterminal = true;
+                        currentNode = add_child(currentNode, stackPush, stackPush->isTerminal);
+                        currentNode = currentNode->child;
+                        // currentNode->data = stackPush;
+                        // currentNode->isterminal = true;
                         currentNode = nextNT(currentNode);
                     }
                     else
