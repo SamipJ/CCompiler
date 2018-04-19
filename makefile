@@ -22,4 +22,4 @@ parser: lexer _Stack.c _Stack.h _Tree.c _Tree.h
 	gcc -c -g _Tree.c
 
 clean:
-	rm *.o exe output* a.out stage1exe parsetreeoutfile*
+	rm *.o stage1exe parsetreeoutfile*
