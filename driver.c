@@ -132,8 +132,8 @@ int main(int argc, char **argv)
         else
             printf("COMPILATION FAILED\n");
         //TESTING
-
-        PrintInorderTree(makeAST(root, NULL));
+        if (flag == 0)
+            PrintInorderASTree(makeAST(root, NULL));
 
         //TESTINGEND
     }

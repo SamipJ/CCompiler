@@ -1,13 +1,13 @@
 # SAMIP JASANI 2015A7PS0127P
 
 run : linkall
-	./stage1exe ./testcases/testcase1.txt ./parsetreeoutfile.txt
+	./stage1exe ./testcases/testcase5.txt ./parsetreeoutfile.txt
 
 linkall: driver
 	gcc lexer.o _Tree.o ast.o _Trie.o _Stack.o parser.o driver.o -o stage1exe
 
 gdb : linkall
-	gdb stage1exe
+	gdb --args ./stage1exe ./testcases/testcase2.txt ./parsetreeoutfile.txt
 
 driver: lexer parser ast driver.c
 	gcc -c -g driver.c
