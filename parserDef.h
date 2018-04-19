@@ -60,7 +60,7 @@ typedef struct rhs *Rhs;
 
 typedef struct rhs
 {
-    int type;
+    enum nont type;
     bool isTerminal;
     Rhs next;
 } rhside;
