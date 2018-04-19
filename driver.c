@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "parser.h"
+#include "ast.h"
 
 int lineNo, bufSize, bufIndex;
 const int noofnt = 44, nooft = 43;
@@ -130,6 +131,11 @@ int main(int argc, char **argv)
             printf("COMPILED SUCCESSFULLY\n");
         else
             printf("COMPILATION FAILED\n");
+        //TESTING
+
+        PrintInorderTree(makeAST(root, NULL));
+
+        //TESTINGEND
     }
     else
     {
