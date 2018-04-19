@@ -4,7 +4,8 @@
 #include "lexerDef.h"
 #include <stdbool.h>
 // typedef rules *Rules;
-
+// extern const char keys1[][45];
+// extern const char keys2[][43];
 enum nont
 {
     mainFunction,
@@ -53,6 +54,7 @@ enum nont
     relationalOp,
     ROOT
 };
+extern const char keys2[][15];
 
 typedef struct rhs *Rhs;
 

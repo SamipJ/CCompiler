@@ -8,5 +8,7 @@ tokenPtr getNextToken();
 void printToken(tokenPtr t);
 struct TrieNode *FillTrie();
 void CommentFree();
+extern const char keys1[][30];
+extern const char keys2[][15];
 // void printToken(tokenPtr t);
 #endif

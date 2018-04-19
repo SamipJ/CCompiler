@@ -1,7 +1,8 @@
 // SAMIP JASANI 2015A7PS0127P
 
 #include "parser.h"
-
+extern const char keys1[][30];
+extern const char keys2[][15];
 typedef struct stack
 {
     int capacity;

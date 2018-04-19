@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 typedef struct node node;
-
+extern const char keys1[][30];
+extern const char keys2[][15];
 typedef node *Node;
 
 struct node

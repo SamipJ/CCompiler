@@ -3,7 +3,8 @@
 #define ALPHABET_SIZE (26)
 #include "lexer.h"
 #include <stdbool.h>
-
+extern const char keys1[][30];
+extern const char keys2[][15];
 struct TrieNode
 {
     struct TrieNode *children[ALPHABET_SIZE];
