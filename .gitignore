@@ -1,9 +1,9 @@
 file
 exe*
-test*
 output*
 parsetreeoutfile.txt
 stage1exe
+
 
 # Prerequisites
 *.d
