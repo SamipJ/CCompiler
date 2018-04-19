@@ -1,0 +1,86 @@
+<mainFunction> ===> MAIN SQO SQC <stmtsAndFunctionDefs> END
+<stmtsAndFunctionDefs> ===> <stmtOrFunctionDef> <moreStmtAndFunctionDefs>
+<moreStmtAndFunctionDefs> ===> <stmtsAndFunctionDefs> 
+<moreStmtAndFunctionDefs> ===> EPSILON
+<stmtOrFunctionDef> ===> <stmt> 
+<stmtOrFunctionDef> ===> <functionDef>
+<stmt> ===> <declarationStmt> SEMICOLON 
+<stmt> ===> ID ASSIGNOP <assignFuncCallSizeStmt> SEMICOLON 
+<stmt> ===> <conditionalStmt> SEMICOLON 
+<stmt> ===> <ioStmt> SEMICOLON 
+<stmt> ===> SQO <varList> SQC ASSIGNOP <funcCallSizeStmt> SEMICOLON 
+<stmt> ===> <funCallStmt> SEMICOLON 
+<functionDef> ===> FUNCTION SQO <parameterList> SQC ASSIGNOP FUNID SQO <parameterList> SQC <stmtsAndFunctionDefs> END SEMICOLON
+<parameterList> ===> <typevar> ID <remainingList>
+<typevar> ===> INT 
+<typevar> ===> REAL 
+<typevar> ===> STRING 
+<typevar> ===> MATRIX
+<remainingList> ===> COMMA <parameterList> 
+<remainingList> ===> EPSILON
+<declarationStmt> ===> <typevar> <varList> 
+<varList> ===> ID <moreIds>
+<moreIds> ===> COMMA <varList> 
+<moreIds> ===> EPSILON
+<assignFuncCallSizeStmt> ===> <assignmentStmt> 
+<assignFuncCallSizeStmt> ===> <funcCallSizeStmt>
+<funcCallSizeStmt> ===> <funCallStmt> 
+<funcCallSizeStmt> ===> <sizeStmt>
+<sizeStmt> ===> SIZE ID 
+<conditionalStmt> ===> IF <booleanExpression> <stmt> <otherStmts> <elseStmt> ENDIF 
+<otherStmts> ===> <stmt> <otherStmts> 
+<otherStmts> ===> EPSILON
+<elseStmt> ===> ELSE <stmt> <otherStmts> 
+<elseStmt> ===> EPSILON
+<ioStmt> ===> READ OP ID CL 
+<ioStmt> ===> PRINT OP ID CL 
+<funCallStmt> ===> FUNID OP <emptyOrInputParameterList> CL 
+<emptyOrInputParameterList> ===> <inputParameterList> 
+<emptyOrInputParameterList> ===> EPSILON
+<inputParameterList> ===> <var> <listVar> 
+<listVar> ===> COMMA <inputParameterList> 
+<listVar> ===> EPSILON
+<assignmentStmt> ===> <arithmeticExpression> 
+<arithmeticExpression> ===> <arithmeticExpression2> <arithmeticExpression1>
+<arithmeticExpression1> ===> <operatorplusminus> <arithmeticExpression> 
+<arithmeticExpression1> ===> EPSILON
+<arithmeticExpression2> ===> <varExpression> <arithmeticExpression3>
+<arithmeticExpression3> ===> <operatormuldiv> <arithmeticExpression2> 
+<arithmeticExpression3> ===> EPSILON
+<varExpression> ===> OP <arithmeticExpression> CL 
+<varExpression> ===> <var>
+<operatorplusminus> ===> PLUS 
+<operatorplusminus> ===> MINUS
+<operatormuldiv> ===> MUL 
+<operatormuldiv> ===> DIV
+<booleanExpression> ===> OP <booleanExpression2> 
+<booleanExpression> ===> NOT OP <booleanExpression2>
+<booleanExpression2> ===> <constrainedVars> <relationalOp> <constrainedVars> CL <moreBooleanExpression> 
+<booleanExpression2> ===> <booleanExpression> CL <moreBooleanExpression>
+<moreBooleanExpression> ===> <logicalOp> <booleanExpression> 
+<moreBooleanExpression> ===> EPSILON
+<constrainedVars> ===> ID 
+<constrainedVars> ===> NUM 
+<constrainedVars> ===> RNUM
+<matrixVar> ===> SQO <matrixRows> SQC
+<matrixRows> ===> <matrixRow> <matrixRows1> 
+<matrixRows1> ===> SEMICOLON <matrixRows> 
+<matrixRows1> ===> EPSILON
+<matrixRow> ===> NUM <matrixRow1>
+<matrixRow1> ===> COMMA <matrixRow> 
+<matrixRow1> ===> EPSILON
+<var> ===> ID <matrixElement> 
+<var> ===> NUM 
+<var> ===> RNUM 
+<var> ===> <matrixVar> 
+<var> ===> STR 
+<matrixElement> ===> SQO NUM COMMA NUM SQC 
+<matrixElement> ===> EPSILON
+<logicalOp> ===> AND 
+<logicalOp> ===> OR
+<relationalOp> ===> LT 
+<relationalOp> ===> LE 
+<relationalOp> ===> EQ 
+<relationalOp> ===> GT 
+<relationalOp> ===> GE 
+<relationalOp> ===> NE
