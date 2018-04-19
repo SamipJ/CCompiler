@@ -27,7 +27,7 @@ Grammer readGrammer(char *fname)
     }
     char *line = NULL, *saveptr1, *str1, *token; //,*p;
     size_t len = 0;
-    ssize_t read;
+    size_t read;
     // char *key;
     // int j, k;
     int lhs, rhs;
@@ -193,7 +193,7 @@ void MakeFirst(Grammer G, char **First)
     return;
 }
 
-void FirstDAC(Grammer G, char **First, char *firstDone, int key)
+void FirstDAC(Grammer G, char **First, char *firstDone, int key)//FIRST DIVIDE AND CONQUER
 {
     int i;
     if (firstDone[key] == '1')
