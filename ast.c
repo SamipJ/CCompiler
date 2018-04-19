@@ -120,16 +120,11 @@ Node makeAST(Node parseTreeNode, Node parentAST)
 
         tokenPtr data = (tokenPtr)parseTreeNode->data;
         int datatype = data->type;
-        if (datatype == NOT)
-        {
-            printf("Helo\n");
-        }
-        //take care of epsilon and other useless terminals
-        if (datatype == EPSILON || datatype == SQO || datatype == SQC || datatype == END || datatype == SEMICOLON || datatype == COMMA || datatype == OP || datatype == CL || datatype == FUNCTION || datatype == ASSIGNOP)
-        {
-            return root;
-        }
-        else if (datatype == MAIN || datatype == INT || datatype == REAL || datatype == STRING || datatype == MATRIX || datatype == PLUS || datatype == MINUS || datatype == MUL || datatype == DIV || datatype == LT || datatype == LE || datatype == EQ || datatype == GT || datatype == GE || datatype == NE || datatype == AND || datatype == OR || datatype == NOT)
+        // if (datatype == NOT)
+        // {
+        //     printf("Helo\n");
+        // }
+        if (datatype == MAIN || datatype == INT || datatype == REAL || datatype == STRING || datatype == MATRIX || datatype == PLUS || datatype == MINUS || datatype == MUL || datatype == DIV || datatype == LT || datatype == LE || datatype == EQ || datatype == GT || datatype == GE || datatype == NE || datatype == AND || datatype == OR || datatype == NOT)
         {
             // parentAST->data = (astNode)calloc(1, sizeof(astnode));
             ((astNode)parentAST->data)->isImp = true;
@@ -148,13 +143,17 @@ Node makeAST(Node parseTreeNode, Node parentAST)
             data->isImp = true;
             data->type = datatype;
             Node curnode = add_child(parentAST, data, false);
-        }
+        } //take care of epsilon and other useless terminals
+        // else if (datatype == EPSILON || datatype == SQO || datatype == SQC || datatype == END || datatype == SEMICOLON || datatype == COMMA || datatype == OP || datatype == CL || datatype == FUNCTION || datatype == ASSIGNOP)
+        // {
+        //     return root;
+        // }
         // else if (datatype == INT || datatype == REAL || datatype == STRING || datatype == MATRIX)
         // {
         //     printf("Hello");
         // }
     }
-
+    free(parseTreeNode);
     return root;
 }
 
