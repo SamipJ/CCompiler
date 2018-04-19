@@ -50,7 +50,8 @@ enum nont
     var,
     matrixElement,
     logicalOp,
-    relationalOp
+    relationalOp,
+    ROOT
 };
 
 typedef struct rhs *Rhs;
