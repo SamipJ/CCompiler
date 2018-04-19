@@ -23,4 +23,6 @@ Node add_child(Node n, void *ptr, bool isterminal);
 Node nextNT(Node n);
 void PrintInorderTree(Node n);
 void FileInorderTree(Node n, FILE *fp);
+void PrintInorderASTree(Node n);
+
 #endif

@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "parserDef.h"
 #include "lexer.h"
-
+#include "astDef.h"
 // const char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
 // const char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
 
@@ -26,7 +26,7 @@ Node add_sibling(Node n, void *ptr, bool isterminal)
     Node sibl = n->sibling;
     sibl->isterminal = isterminal;
     sibl->parent = n->parent;
-    return n;
+    return sibl;
 }
 
 Node add_child(Node n, void *ptr, bool isterminal)
@@ -36,8 +36,8 @@ Node add_child(Node n, void *ptr, bool isterminal)
         return NULL;
     if (n->child)
     {
-        add_sibling(n->child, ptr, isterminal);
-        return n;
+        child = add_sibling(n->child, ptr, isterminal);
+        return child;
     }
     else
     {
@@ -45,7 +45,7 @@ Node add_child(Node n, void *ptr, bool isterminal)
         child = n->child;
         child->parent = n;
     }
-    return n;
+    return child;
 }
 
 Node nextNT(Node n)
@@ -167,5 +167,39 @@ void FileInorderTree(Node n, FILE *fp)
             n = n->sibling;
             FileInorderTree(n, fp);
         }
+    }
+}
+
+void PrintInorderASTree(Node n)
+{
+    // char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
+    // char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
+    if (n->child)
+    {
+        printf("\\|/\n");
+        PrintInorderASTree(n->child);
+        printf("/|\\\n");
+    }
+    if (n->isterminal)
+        printToken(n->data);
+    else
+    {
+        if (((astNode)(n->data))->isImp)
+            printf("%s\n", keys2[((astNode)(n->data))->type]);
+        else
+            printf("%s\n", keys1[((astNode)(n->data))->type]);
+    }
+    n = n->child;
+    if (n)
+    {
+        printf("\\|/\n");
+
+        while (n->sibling)
+        {
+            printf("->\n");
+            n = n->sibling;
+            PrintInorderASTree(n);
+        }
+        printf("/|\\\n");
     }
 }
