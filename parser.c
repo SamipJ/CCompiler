@@ -596,12 +596,12 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                     while (stackPush != NULL && ((stackPush->type != EPSILON && stackPush->isTerminal) || (!stackPush->isTerminal)))
                     {
                         push(revStack, stackPush);
-                        currentNode = add_child(currentNode, stackPush, stackPush->isTerminal);
+                        add_child(currentNode, stackPush, stackPush->isTerminal);
                         stackPush = stackPush->next;
                     }
                     if (stackPush != NULL && (stackPush->type == EPSILON && stackPush->isTerminal))
                     {
-                        currentNode = add_child(currentNode, stackPush, stackPush->isTerminal);
+                        add_child(currentNode, stackPush, stackPush->isTerminal);
                         currentNode = currentNode->child;
                         // currentNode->data = stackPush;
                         // currentNode->isterminal = true;
@@ -697,7 +697,7 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                     //             while (stackPush != NULL && ((stackPush->type != EPSILON && stackPush->isTerminal) || (!stackPush->isTerminal)))
                     //             {
                     //                 push(revStack, stackPush);
-                    //                 currentNode = add_child(currentNode, stackPush, stackPush->isTerminal);
+                    //                 add_child(currentNode, stackPush, stackPush->isTerminal);
                     //                 stackPush = stackPush->next;
                     //             }
                     //             if (stackPush != NULL && (stackPush->type == EPSILON && stackPush->isTerminal))
