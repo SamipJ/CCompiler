@@ -27,7 +27,7 @@
 <funcCallSizeStmt> ===> <funCallStmt> 
 <funcCallSizeStmt> ===> <sizeStmt>
 <sizeStmt> ===> SIZE ID 
-<conditionalStmt> ===> IF <booleanExpression> <stmt> <otherStmts> <elseStmt> ENDIF 
+<conditionalStmt> ===> IF OP <booleanExpression> CL <stmt> <otherStmts> <elseStmt> ENDIF 
 <otherStmts> ===> <stmt> <otherStmts> 
 <otherStmts> ===> EPSILON
 <elseStmt> ===> ELSE <stmt> <otherStmts> 
@@ -53,12 +53,11 @@
 <operatorplusminus> ===> MINUS
 <operatormuldiv> ===> MUL 
 <operatormuldiv> ===> DIV
-<booleanExpression> ===> OP <booleanExpression2> 
-<booleanExpression> ===> NOT OP <booleanExpression2>
-<booleanExpression2> ===> <constrainedVars> <relationalOp> <constrainedVars> CL <moreBooleanExpression> 
-<booleanExpression2> ===> <booleanExpression> CL <moreBooleanExpression>
-<moreBooleanExpression> ===> <logicalOp> <booleanExpression> 
-<moreBooleanExpression> ===> EPSILON
+<booleanExpression> ===> OP <booleanExpression> CL <booleanExpression2> 
+<booleanExpression> ===> <constrainedVars> <relationalOp> <constrainedVars> 
+<booleanExpression> ===> NOT OP <booleanExpression> CL 
+<booleanExpression2> ===> <logicalOp> OP <booleanExpression> CL 
+<booleanExpression2> ===> EPSILON
 <constrainedVars> ===> ID 
 <constrainedVars> ===> NUM 
 <constrainedVars> ===> RNUM

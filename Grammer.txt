@@ -13,7 +13,7 @@
 <assignFuncCallSizeStmt> ===> <assignmentStmt> | <funcCallSizeStmt>
 <funcCallSizeStmt> ===> <funCallStmt> | <sizeStmt>
 <sizeStmt> ===> SIZE ID 
-<conditionalStmt> ===> IF <booleanExpression> <stmt> <otherStmts> <elseStmt> ENDIF 
+<conditionalStmt> ===> IF OP <booleanExpression> CL <stmt> <otherStmts> <elseStmt> ENDIF 
 <otherStmts> ===> <stmt> <otherStmts> | EPSILON
 <elseStmt> ===> ELSE <stmt> <otherStmts> | EPSILON
 <ioStmt> ===> READ OP ID CL | PRINT OP ID CL 
@@ -29,9 +29,8 @@
 <varExpression> ===> OP <arithmeticExpression> CL | <var>
 <operatorplusminus> ===> PLUS | MINUS
 <operatormuldiv> ===> MUL | DIV
-<booleanExpression> ===> OP <booleanExpression2> | NOT OP <booleanExpression2>
-<booleanExpression2> ===> <constrainedVars> <relationalOp> <constrainedVars> CL <moreBooleanExpression> | <booleanExpression> CL <moreBooleanExpression>
-<moreBooleanExpression> ===> <logicalOp> <booleanExpression> | EPSILON
+<booleanExpression> ===> OP <booleanExpression> CL <booleanExpression2> | <constrainedVars> <relationalOp> <constrainedVars> | NOT OP <booleanExpression> CL
+<booleanExpression2> ===>  <logicalOp> OP <booleanExpression> CL | EPSILON
 <constrainedVars> ===> ID | NUM | RNUM
 <matrixVar> ===> SQO <matrixRows> SQC
 <matrixRows> ===> <matrixRow> <matrixRows1> 
