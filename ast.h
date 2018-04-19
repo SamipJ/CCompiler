@@ -9,5 +9,7 @@ extern const char keys2[][15];
 // extern const char keys2[][43];
 
 Node makeAST(Node parseTreeNode, Node parentAST);
+void rebalanceMatrixRows(Node rows);
+void rebalanceMatrixRow(Node row);
 
 #endif

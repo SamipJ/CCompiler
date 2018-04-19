@@ -5,11 +5,11 @@
 
 extern const char keys1[][30];
 extern const char keys2[][15];
-// typedef struct astnode
-// {
-//     int type;
-//     int value;
-// } astnode;
-// typedef astnode *astNode;
+typedef struct astnode
+{
+    int type;
+    bool isImp; //something like MAIN,+ else declstmt
+} astnode;
+typedef astnode *astNode;
 
 #endif
