@@ -39,6 +39,7 @@ Node makeST(Node astRoot, Node stRoot)
                         enum tokenType type = ((astNode)child->data)->type;
                         child = child->sibling;
                         char *id = ((tokenPtr)child->data)->string;
+                        addOutput(stRoot->data, type, id);
                         insertInHT(createHTNode(id, type, 0), stRoot->data);
                         child = child->sibling;
                     }
@@ -50,8 +51,15 @@ Node makeST(Node astRoot, Node stRoot)
                         enum tokenType type = ((astNode)child->data)->type;
                         child = child->sibling;
                         char *id = ((tokenPtr)child->data)->string;
+                        addInput(stRoot->data, type, id);
                         insertInHT(createHTNode(id, type, 1), stRoot->data);
                         child = child->sibling;
+                    }
+                    else if (!((astNode)child->data)->isImp && (((astNode)child->data)->type == END))
+                    {
+                        ((htHead)stRoot->data)->lineno = ((tokenPtr)child->data)->lineno;
+                        checkInitialization(stRoot);
+                        break;
                     }
                     else
                     {
@@ -70,9 +78,72 @@ Node makeST(Node astRoot, Node stRoot)
             while (child)
             {
                 char *id = ((tokenPtr)child->data)->string;
-                insertInHT(createHTNode(id, type, 1), stRoot->data);
+                int check = checkDeclaration(stRoot, (tokenPtr)child->data);
+                if (check == ERROR)
+                    insertInHT(createHTNode(id, type, 1), stRoot->data);
+                else
+                {
+                    printf("ERROR(A) in line %d\n", ((tokenPtr)child->data)->lineno);
+                }
                 child = child->sibling;
             }
+        }
+        else if (!((astNode)astRoot->data)->isImp && ((astNode)astRoot->data)->type == assignmentStmt)
+        {
+            int check = checkType(stRoot, astRoot);
+            if (check == 1)
+            {
+                int lhs = checkDeclaration(stRoot, ((tokenPtr)astRoot->child->data));
+
+                if (lhs == MATRIX)
+                {
+                    sizeptr temp = computeSize(stRoot, astRoot->child->sibling, MATRIX);
+                    if (temp)
+                    {
+                        assignwidth(stRoot->data, ((tokenPtr)astRoot->child->data)->string, temp->x, temp->y);
+                        setInitialised(stRoot, (tokenPtr)astRoot->child->data);
+                        free(temp);
+                    }
+                }
+                else if (lhs == STRING)
+                {
+                    sizeptr temp = computeSize(stRoot, astRoot->child->sibling, STRING);
+                    assignwidth(stRoot->data, ((tokenPtr)astRoot->child->data)->string, temp->x, temp->y);
+                    setInitialised(stRoot, (tokenPtr)astRoot->child->data);
+                    free(temp);
+                }
+                else
+                {
+                    setInitialised(stRoot, (tokenPtr)astRoot->child->data);
+                }
+            }
+        }
+        else if (!((astNode)astRoot->data)->isImp && ((astNode)astRoot->data)->type == funCallStmt)
+        {
+            Node child = astRoot->child;
+            while (child)
+            {
+                if (child->isterminal && ((tokenPtr)child->data)->type == FUNID)
+                {
+                    break;
+                }
+                else
+                {
+                    child = child->sibling;
+                }
+            }
+            Node temp = findFunc(((tokenPtr)child->data)->string, stRoot);
+            if (temp)
+            {
+                parNode input = ((htHead)temp->data)->input;
+                parNode output = ((htHead)temp->data)->output;
+                Node outputAST = astRoot->child;
+                Node inputAST = child->sibling;
+                compareParameters(stRoot, output, outputAST, NULL);
+                compareParameters(stRoot, input, inputAST, child);
+            }
+            else
+                (printf("ERROR(G) in line %d\n", ((tokenPtr)child->data)->lineno));
         }
         // else if (!((astNode)astRoot->data)->isImp && ((astNode)astRoot->data)->type == assignmentStmt)
         // {
@@ -86,7 +157,7 @@ Node makeST(Node astRoot, Node stRoot)
         //         }
         //     }
         // }
-        }
+    }
 
     return stRoot;
 }
@@ -100,7 +171,7 @@ void printST(Node root)
     Node child = root->child;
     while (child)
     {
-        printHT(child->data);
+        printST(child);
         child = child->sibling;
     }
 }
