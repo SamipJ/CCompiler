@@ -31,7 +31,7 @@
 <operatormuldiv> ===> MUL | DIV
 <booleanExpression> ===> OP <booleanExpression> CL <booleanExpression2> | <constrainedVars> <relationalOp> <constrainedVars> | NOT OP <booleanExpression> CL
 <booleanExpression2> ===>  <logicalOp> OP <booleanExpression> CL | EPSILON
-<constrainedVars> ===> ID | NUM | RNUM
+<constrainedVars> ===> ID <matrixElement> | NUM | RNUM
 <matrixVar> ===> SQO <matrixRows> SQC
 <matrixRows> ===> <matrixRow> <matrixRows1> 
 <matrixRows1> ===> SEMICOLON <matrixRows> | EPSILON
