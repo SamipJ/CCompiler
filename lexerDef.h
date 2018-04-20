@@ -48,7 +48,8 @@ enum tokenType
     GE,
     NE,
     EPSILON,
-    FINISH
+    FINISH,
+    BOOL
 };
 
 extern const char keys1[][30];
