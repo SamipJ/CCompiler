@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "parser.h"
 #include "ast.h"
+#include "symbolTable.h"
 
 int lineNo, bufSize, bufIndex;
 const int noofnt = 44, nooft = 43;
@@ -133,8 +134,12 @@ int main(int argc, char **argv)
             printf("COMPILATION FAILED\n");
         //TESTING
         if (flag == 0)
-            PrintInorderASTree(makeAST(root, NULL));
-
+        {
+            Node astRoot = makeAST(root, NULL);
+            PrintInorderASTree(astRoot);
+            Node stRoot = makeST(astRoot, NULL);
+            printST(stRoot);
+        }
         //TESTINGEND
     }
     else

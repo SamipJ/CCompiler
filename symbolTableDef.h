@@ -1,0 +1,5 @@
+// SAMIP JASANI 2015A7PS0127P
+#ifndef SYMBOLTABLEDEF_H
+#define SYMBOLTABLEDEF_H
+#include "astDef.h"
+#endif
