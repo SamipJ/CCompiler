@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "ctype.h": "c",
-        "ast.h": "c",
-        "lexer.h": "c",
-        "_tree.h": "c"
-    }
-}

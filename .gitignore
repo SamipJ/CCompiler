@@ -3,6 +3,7 @@ exe*
 output*
 parsetreeoutfile.txt
 stage1exe
+.vscode/
 
 
 # Prerequisites
