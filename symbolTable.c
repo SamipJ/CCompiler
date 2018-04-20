@@ -31,8 +31,29 @@ Node makeST(Node astRoot, Node stRoot)
                     if (child->isterminal && ((tokenPtr)child->data)->type == FUNID)
                     {
                         funcset = 1;
-                        ((htHead)stRoot->data)->scope = ((tokenPtr)child->data)->string;
-                        child = child->sibling;
+                        //check if function is not overloaded;
+                        int check = checkOverloading(((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno, stRoot);
+                        if (check == 1)
+                        {
+                            //free a components of hthead
+                            Node temp = stRoot->parent->child;
+                            while (temp->sibling)
+                            {
+                                if (temp->sibling == stRoot)
+                                {
+                                    temp->sibling = NULL;
+                                    break;
+                                }
+                                temp = temp->sibling;
+                            }
+                            free(stRoot);
+                            return NULL;
+                        }
+                        else
+                        {
+                            ((htHead)stRoot->data)->scope = ((tokenPtr)child->data)->string;
+                            child = child->sibling;
+                        }
                     }
                     else
                     {
@@ -55,11 +76,11 @@ Node makeST(Node astRoot, Node stRoot)
                         insertInHT(createHTNode(id, type, 1), stRoot->data);
                         child = child->sibling;
                     }
-                    else if (!((astNode)child->data)->isImp && (((astNode)child->data)->type == END))
+                    else if (child->isterminal && !((astNode)child->data)->isImp && (((astNode)child->data)->type == END))
                     {
                         ((htHead)stRoot->data)->lineno = ((tokenPtr)child->data)->lineno;
                         checkInitialization(stRoot);
-                        break;
+                        return stRoot;
                     }
                     else
                     {
@@ -114,6 +135,10 @@ Node makeST(Node astRoot, Node stRoot)
                 }
                 else
                 {
+                    if (strcmp("u", ((tokenPtr)astRoot->child->data)->string) == 0)
+                    {
+                        printf("hello\n");
+                    }
                     setInitialised(stRoot, (tokenPtr)astRoot->child->data);
                 }
             }
@@ -141,6 +166,12 @@ Node makeST(Node astRoot, Node stRoot)
                 Node inputAST = child->sibling;
                 compareParameters(stRoot, output, outputAST, NULL);
                 compareParameters(stRoot, input, inputAST, child);
+                outputAST = astRoot->child;
+                while (outputAST != child)
+                {
+                    setInitialised(stRoot, (tokenPtr)outputAST->data);
+                    outputAST = outputAST->sibling;
+                }
             }
             else
                 (printf("ERROR(G) in line %d\n", ((tokenPtr)child->data)->lineno));

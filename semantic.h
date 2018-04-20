@@ -26,5 +26,6 @@ int typeAE(Node stRoot, Node astRoot);
 int checkDeclaration(Node stRoot, tokenPtr token);
 int checkInitialization(Node stRoot);
 void compareParameters(Node stRoot, parNode input, Node inputAST, Node till);
+int checkOverloading(char *funcid, int lineno, Node stRoot);
 
 #endif

@@ -119,7 +119,7 @@ int typeAE(Node stRoot, Node astRoot)
         if (curnode->type == ID)
         {
             int check = checkDeclaration(stRoot, curnode);
-            if (check != -1)
+            if (check != ERROR)
                 return check;
             else
                 return ERROR;
@@ -358,4 +358,20 @@ sizeptr computeSize(Node stRoot, Node astRoot, int type)
             }
         }
     }
+}
+
+int checkOverloading(char *funcid, int lineno, Node stRoot)
+{
+    Node parentscope = stRoot->parent;
+    Node child = parentscope->child;
+    while (child)
+    {
+        if (strcmp(((htHead)child->data)->scope, funcid) == 0)
+        {
+            printf("ERROR(O) for func %s in line %d\n", funcid, lineno);
+            return 1;
+        }
+        child = child->sibling;
+    }
+    return 0;
 }

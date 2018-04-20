@@ -20,7 +20,7 @@ htHead createEmptyHT(const char *scope, int nesting_level, const char *parentsco
     head->ht = (hashTable *)calloc(M, sizeof(hashTable));
     head->input = NULL;
     head->output = NULL;
-    head->lineno = 0;
+    head->lineno = 1;
     return head;
 }
 
@@ -186,7 +186,7 @@ void assignwidth(htHead head, char *id, int x, int y)
 
 void printHT(htHead head)
 {
-    printf("Scope: %s\tNesting Level: %d\tParent Scope:%s\n\n", head->scope, head->nesting_level, head->parentscope);
+    printf("Scope: %s\tNesting Level: %d\tParent Scope:%s\tLine No:%d\n", head->scope, head->nesting_level, head->parentscope, head->lineno);
     int i;
     hashTable temp;
     for (i = 0; i < M; i++)
@@ -194,7 +194,7 @@ void printHT(htHead head)
         temp = head->ht[i];
         while (temp)
         {
-            printf("%s\t%s\t%d\t%d\n", temp->id, keys2[temp->type], temp->width, temp->offset);
+            printf("%s\t%s\t%d\t%d\t%d\n", temp->id, keys2[temp->type], temp->width, temp->offset, temp->initialised);
             temp = temp->next;
         }
     }
