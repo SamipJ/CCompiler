@@ -34,7 +34,7 @@ Node makeAST(Node parseTreeNode, Node parentAST)
 
         //take care of singelton rules
         //take care of normal children
-        if (datatype == var || datatype == stmtsAndFunctionDefs || datatype == otherStmts || datatype == inputParameterList || datatype == varList || datatype == moreIds || datatype == remainingList || datatype == moreStmtAndFunctionDefs || datatype == stmtOrFunctionDef || datatype == assignFuncCallSizeStmt || datatype == funcCallSizeStmt || datatype == emptyOrInputParameterList || datatype == listVar || datatype == operatorplusminus || datatype == operatormuldiv || datatype == constrainedVars || datatype == logicalOp || datatype == relationalOp || datatype == assignmentStmt || datatype == arithmeticExpression1 || datatype == declarationStmt || datatype == parameterList || datatype == arithmeticExpression3 || datatype == varExpression || datatype == funCallStmt || datatype == matrixRows1 || datatype == matrixRow1 || datatype == ioStmt || datatype == conditionalStmt || datatype == booleanExpression2 || datatype == sizeStmt)
+        if (datatype == var || datatype == stmtsAndFunctionDefs || datatype == otherStmts || datatype == inputParameterList || datatype == varList || datatype == moreIds || datatype == remainingList || datatype == moreStmtAndFunctionDefs || datatype == stmtOrFunctionDef || datatype == assignFuncCallSizeStmt || datatype == funcCallSizeStmt || datatype == emptyOrInputParameterList || datatype == listVar || datatype == operatorplusminus || datatype == operatormuldiv || datatype == constrainedVars || datatype == logicalOp || datatype == relationalOp || datatype == assignmentStmt || datatype == arithmeticExpression1 || datatype == declarationStmt || datatype == parameterList || datatype == arithmeticExpression3 || datatype == varExpression || datatype == funCallStmt || datatype == matrixRows1 || datatype == matrixRow1 || datatype == ioStmt || datatype == conditionalStmt || datatype == booleanExpression2 || datatype == sizeStmt || datatype == matrixElement)
         {
             //add node name declstmt
 
@@ -46,7 +46,7 @@ Node makeAST(Node parseTreeNode, Node parentAST)
             }
         }
         //add node for stmt or functiondef
-        else if (datatype == functionDef || datatype == stmt || datatype == arithmeticExpression || datatype == arithmeticExpression2 || datatype == typevar || datatype == matrixVar || datatype == matrixRows || datatype == matrixRow || datatype == booleanExpression || datatype == elseStmt || datatype == matrixElement)
+        else if (datatype == functionDef || datatype == stmt || datatype == arithmeticExpression || datatype == arithmeticExpression2 || datatype == typevar || datatype == matrixVar || datatype == matrixRows || datatype == matrixRow || datatype == booleanExpression || datatype == elseStmt)
         {
             astNode astdata = (astNode)calloc(1, sizeof(astnode));
             astdata->isImp = false;
@@ -110,7 +110,7 @@ Node makeAST(Node parseTreeNode, Node parentAST)
             }
         }
 
-        if (datatype == declarationStmt || datatype == sizeStmt || datatype == conditionalStmt || datatype == ioStmt || datatype == funCallStmt || datatype == assignmentStmt)
+        if (datatype == declarationStmt || datatype == sizeStmt || datatype == conditionalStmt || datatype == ioStmt || datatype == funCallStmt || datatype == assignmentStmt || datatype == matrixElement)
         {
             ((astNode)parentAST->data)->type = datatype;
         }
@@ -131,7 +131,7 @@ Node makeAST(Node parseTreeNode, Node parentAST)
             ((astNode)parentAST->data)->type = datatype;
             // printf("%lu %d\n", parentAST, ((astNode)parentAST->data)->type);
         }
-        else if (datatype == ID || datatype == NUM || datatype == RNUM || datatype == STR || datatype == FUNID || datatype == READ || datatype == PRINT)
+        else if (datatype == ID || datatype == NUM || datatype == RNUM || datatype == STR || datatype == FUNID || datatype == READ || datatype == PRINT || datatype == END)
         {
             // if (datatype == NUM) //delete later
             // return root;
