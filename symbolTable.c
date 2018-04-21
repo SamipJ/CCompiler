@@ -61,7 +61,14 @@ Node makeST(Node astRoot, Node stRoot)
                         child = child->sibling;
                         char *id = ((tokenPtr)child->data)->string;
                         addOutput(stRoot->data, type, id);
-                        insertInHT(createHTNode(id, type, 0), stRoot->data);
+                        int check = checkDeclaration(stRoot, (tokenPtr)child->data);
+                        if (check == ERROR)
+                            insertInHT(createHTNode(id, type, 1), stRoot->data);
+                        else
+                        {
+                            printf("ERROR(A) in line %d\n", ((tokenPtr)child->data)->lineno);
+                        }
+                        // insertInHT(createHTNode(id, type, 0), stRoot->data);
                         child = child->sibling;
                     }
                 }
@@ -73,7 +80,14 @@ Node makeST(Node astRoot, Node stRoot)
                         child = child->sibling;
                         char *id = ((tokenPtr)child->data)->string;
                         addInput(stRoot->data, type, id);
-                        insertInHT(createHTNode(id, type, 1), stRoot->data);
+                        int check = checkDeclaration(stRoot, (tokenPtr)child->data);
+                        if (check == ERROR)
+                            insertInHT(createHTNode(id, type, 1), stRoot->data);
+                        else
+                        {
+                            printf("ERROR(A) in line %d\n", ((tokenPtr)child->data)->lineno);
+                        }
+                        // insertInHT(createHTNode(id, type, 1), stRoot->data);
                         child = child->sibling;
                     }
                     else if (child->isterminal && !((astNode)child->data)->isImp && (((astNode)child->data)->type == END))
@@ -176,18 +190,107 @@ Node makeST(Node astRoot, Node stRoot)
             else
                 (printf("ERROR(G) in line %d\n", ((tokenPtr)child->data)->lineno));
         }
-        // else if (!((astNode)astRoot->data)->isImp && ((astNode)astRoot->data)->type == assignmentStmt)
-        // {
-        //     Node child = astRoot->child;
-        //     char *id = ((tokenPtr)child->data)->string;
-        //     int check = checkST(stRoot, id);
-        //     if (check != -1)
-        //     {
-        //         if (check == MATRIX || check == STRING)
-        //         {
-        //         }
-        //     }
-        // }
+        else if (!((astNode)astRoot->data)->isImp && ((astNode)astRoot->data)->type == sizeStmt)
+        {
+            int count = 0;
+            Node child = astRoot->child;
+            while (1)
+            {
+                if (((astNode)child->data)->isImp && ((astNode)child->data)->type == SIZE)
+                    break;
+                count++;
+                if (checkDeclaration(stRoot, child->data) != INT)
+                {
+                    printf("ERROR(N) %s not of type INT in line %d\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                }
+                child = child->sibling;
+            }
+            child = child->sibling;
+            if (count == 2)
+            {
+                if (checkDeclaration(stRoot, child->data) != MATRIX)
+                {
+                    printf("ERROR(M) %s should be of type MATRIX in line %d or LHS should have only 1 parameter\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                }
+            }
+            else if (count == 1)
+            {
+                if (checkDeclaration(stRoot, child->data) != STRING)
+                {
+                    printf("ERROR(M) %s should be of type STRING in line %d or LHS should have 2 parameters\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                }
+            }
+            else
+            {
+                if (checkDeclaration(stRoot, child->data) == STRING)
+                {
+                    printf("ERROR(M) %s is of type STRING so in line %d LHS should have only 1 parameter\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                }
+                else if (checkDeclaration(stRoot, child->data) == MATRIX)
+                {
+                    printf("ERROR(M) %s is of type MATRIX in line %d so LHS should have 2 parameters\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                }
+                else
+                {
+                    printf("ERROR(M) %s is of type %s in line %d RHS should be STRING(LHS: 1 parameter) or MATRIX(LHS:2 parameters)\n", ((tokenPtr)child->data)->string, keys2[((tokenPtr)child->data)->type], ((tokenPtr)child->data)->lineno);
+                }
+            }
+        }
+        else if (!((astNode)astRoot->data)->isImp && ((astNode)astRoot->data)->type == ioStmt)
+        {
+            int type = ((tokenPtr)astRoot->child->data)->type;
+            Node child = astRoot->child->sibling;
+            if (type == READ)
+            {
+                int datatype = checkDeclaration(stRoot, child->data);
+                if (datatype == ERROR)
+                {
+                    printf("ERROR(U) undeclared %s on line %d\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                }
+                else if (datatype == INT || datatype == REAL)
+                {
+                    return stRoot;
+                }
+                else
+                {
+                    printf("%s is of type %s, only INT and REAL can be READ on line %d\n", ((tokenPtr)child->data)->string, keys2[checkDeclaration(stRoot, child->data)], ((tokenPtr)child->data)->lineno);
+                }
+            }
+            else
+            {
+                int datatype = checkDeclaration(stRoot, child->data);
+                if (datatype == ERROR)
+                {
+                    printf("ERROR(U) undeclared %s on line %d\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                }
+                return stRoot;
+            }
+        }
+        else if (!((astNode)astRoot->data)->isImp && ((astNode)astRoot->data)->type == conditionalStmt)
+        {
+            Node child = astRoot->child;
+            if (typeAE(stRoot, child) != BOOL)
+            {
+                Node temp = child;
+                while (!temp->isterminal)
+                {
+                    temp = temp->child;
+                }
+                printf("ERROR(K) BOOLEAN Expression incorrect on line %d\n", ((tokenPtr)temp->data)->lineno);
+            }
+            child = child->sibling;
+            while (!(!child->isterminal && !((astNode)child->data)->isImp && ((astNode)child->data)->type == elseStmt))
+            {
+                makeST(child, stRoot);
+                child = child->sibling;
+            }
+            child = child->child;
+            while (child)
+            {
+                makeST(child, stRoot);
+                child = child->sibling;
+            }
+        }
     }
 
     return stRoot;
