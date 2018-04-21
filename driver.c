@@ -14,138 +14,146 @@ char *buf;
 FILE *fp;
 int strsize;
 int flag = 0;
+int memory = 0;
 
 int main(int argc, char **argv)
 {
-    bufSize = 1024;
-    lineNo = 1;
-    bufIndex = 0;
+    Node x = (Node)malloc(sizeof(node) * 10);
+    printf("%lu\n", sizeof(*x));
+    void *y = (void *)x;
+    printf("%lu\n", sizeof(*y));
     int i, j, option;
     FILE *fileout;
     tokenPtr t;
-    // noofnt = 44;
-    // nooft = 43;
-    printf(" (a) FIRST and FOLLOW set automated \n (b) Both lexical and syntax analysis modules implemented\n (c) Runs on all testcases\n\n");
-    printf("Press Option for the defined task: \n 1. for print comment free code \n 2. print token list by lexer \n 3. Parsing of Source Code \n 4. Parsing and Printing Parse Tree\n >> ");
-    scanf("%d", &option);
-    buf = (char *)calloc(bufSize, sizeof(char));
-    if (argc >= 2)
+    if (argc != 3)
+    {
+        printf("[Usage]: ./compiler testcasefile codegenerationfile\n");
+    }
+    else
     {
         fp = fopen(argv[1], "r");
     }
-    else
-    {
-        fp = fopen("./testcases/testcase1.txt", "r");
-    }
     root = FillTrie();
-    if (option == 1)
+    printf(" (a) FIRST and FOLLOW set automated \n (b) Both lexical and syntax analysis modules implemented\n (c) Runs on all testcases\n\n");
+    while (1)
     {
-        CommentFree();
-    }
-    else if (option == 2)
-    {
-        fp = getStream(fp, buf);
-        while (fp != NULL || buf[bufIndex] != '\0')
+        flag = 0;
+        bufSize = 1024;
+        lineNo = 1;
+        buf = (char *)calloc(bufSize, sizeof(char));
+        bufIndex = 0;
+        fp = fopen(argv[1], "r");
+        printf("Press Option for the defined task: \n 1. for print comment free code \n 2. print token list by lexer \n 3. Parsing of Source Code \n 4. Parsing and Printing Parse Tree\n >> ");
+        scanf("%d", &option);
+        switch (option)
         {
-            t = getNextToken();
-            printToken(t);
+        case 0:
+            return 0;
+            break;
+        case 1:
+        {
+            fp = getStream(fp, buf);
+            while (fp != NULL || buf[bufIndex] != '\0')
+            {
+                t = getNextToken();
+                printToken(t);
+            }
+            break;
+        }
+        case 2:
+        {
+            Grammer G = readGrammer("Grammer.txt");
+            char **First = (char **)calloc(noofnt, sizeof(char *));
+            for (i = 0; i < noofnt; i++)
+            {
+                First[i] = (char *)calloc(nooft, sizeof(char));
+                for (j = 0; j < nooft; j++)
+                    First[i][j] = '0';
+            }
+            MakeFirst(G, First);
+            char **Follow = (char **)calloc(noofnt, sizeof(char *));
+            for (i = 0; i < noofnt; i++)
+            {
+                Follow[i] = (char *)calloc(nooft, sizeof(char));
+                for (j = 0; j < nooft; j++)
+                    Follow[i][j] = '0';
+            }
+            MakeFollow(G, Follow, First);
+            Rules **parseTable = MakeParseTable(G, Follow, First);
+            Node root = makeParseTree(parseTable, First, Follow);
+            if (flag == 0)
+            {
+                FileInorderTree(root, stdout);
+                printf("COMPILED SUCCESSFULLY\n");
+            }
+            else
+                printf("COMPILATION FAILED\n");
+            break;
+        }
+        case 3:
+        {
+            Grammer G = readGrammer("Grammer.txt");
+            char **First = InitialiseFirst();
+            MakeFirst(G, First);
+            char **Follow = InitialiseFollow();
+            MakeFollow(G, Follow, First);
+            Rules **parseTable = MakeParseTable(G, Follow, First);
+            Node root = makeParseTree(parseTable, First, Follow);
+            if (flag == 0)
+            {
+                Node astRoot = makeAST(root, NULL);
+                printf("Printing Inorder Traversal of AST\n");
+                PrintInorderASTree(astRoot);
+                // Node stRoot = makeST(astRoot, NULL);
+                // printST(stRoot);
+            }
+            else
+                printf("SYNTACTIC FAILURE\n");
+            break;
+        }
+        case 4:
+            //calculate size
+            break;
+        case 5:
+        {
+            Grammer G = readGrammer("Grammer.txt");
+            char **First = InitialiseFirst();
+            MakeFirst(G, First);
+            char **Follow = InitialiseFollow();
+            MakeFollow(G, Follow, First);
+            Rules **parseTable = MakeParseTable(G, Follow, First);
+            Node root = makeParseTree(parseTable, First, Follow);
+            if (flag == 0)
+            {
+                Node astRoot = makeAST(root, NULL);
+                Node stRoot = makeST(astRoot, NULL);
+                printST(stRoot);
+            }
+            else
+                printf("SYNTACTIC FAILURE\n");
+            break;
+        }
+        case 6:
+        {
+            Grammer G = readGrammer("Grammer.txt");
+            char **First = InitialiseFirst();
+            MakeFirst(G, First);
+            char **Follow = InitialiseFollow();
+            MakeFollow(G, Follow, First);
+            Rules **parseTable = MakeParseTable(G, Follow, First);
+            Node root = makeParseTree(parseTable, First, Follow);
+            if (flag == 0)
+            {
+                Node astRoot = makeAST(root, NULL);
+                Node stRoot = makeST(astRoot, NULL);
+            }
+            else
+                printf("SYNTACTIC FAILURE\n");
+            break;
+        }
+        default:
+            return 0;
         }
     }
-    else if (option == 3)
-    {
-        Grammer G = readGrammer("Grammer.txt");
-        // printGrammer(G);
-        char **First = (char **)calloc(noofnt, sizeof(char *));
-        for (i = 0; i < noofnt; i++)
-        {
-            First[i] = (char *)calloc(nooft, sizeof(char));
-            for (j = 0; j < nooft; j++)
-                First[i][j] = '0';
-        }
-        MakeFirst(G, First);
-        // printFirst(First);
-        char **Follow = (char **)calloc(noofnt, sizeof(char *));
-        for (i = 0; i < noofnt; i++)
-        {
-            Follow[i] = (char *)calloc(nooft, sizeof(char));
-            for (j = 0; j < nooft; j++)
-                Follow[i][j] = '0';
-        }
-        MakeFollow(G, Follow, First);
-        // printFollow(Follow);
-        Rules **parseTable = MakeParseTable(G, Follow, First);
-        // printParseTable(parseTable);
-        Node root = makeParseTree(parseTable, First, Follow);
-        // PrintInorderTree(root);
-        // if (argc >= 3)
-        // {
-        //     fileout = fopen(argv[2], "w+");
-        // }
-        // else
-        // {
-        //     fileout = fopen("./parsetreeoutfile.txt", "w+");
-        // }
-        // FileInorderTree(root, fileout);
-        if (flag == 0)
-            printf("COMPILED SUCCESSFULLY\n");
-        else
-            printf("COMPILATION FAILED\n");
-    }
-    else if (option == 4)
-    {
-        root = FillTrie();
-        Grammer G = readGrammer("Grammer.txt");
-        // printGrammer(G);
-        char **First = (char **)calloc(noofnt, sizeof(char *));
-        for (i = 0; i < noofnt; i++)
-        {
-            First[i] = (char *)calloc(nooft, sizeof(char));
-            for (j = 0; j < nooft; j++)
-                First[i][j] = '0';
-        }
-        MakeFirst(G, First);
-        // printFirst(First);
-        char **Follow = (char **)calloc(noofnt, sizeof(char *));
-        for (i = 0; i < noofnt; i++)
-        {
-            Follow[i] = (char *)calloc(nooft, sizeof(char));
-            for (j = 0; j < nooft; j++)
-                Follow[i][j] = '0';
-        }
-        MakeFollow(G, Follow, First);
-        // printFollow(Follow);
-        Rules **parseTable = MakeParseTable(G, Follow, First);
-        // printParseTable(parseTable);
-        Node root = makeParseTree(parseTable, First, Follow);
-        // PrintInorderTree(root);
-        if (argc >= 3)
-        {
-            fileout = fopen(argv[2], "w+");
-        }
-        else
-        {
-            fileout = fopen("./parsetreeoutfile.txt", "w+");
-        }
-        FileInorderTree(root, fileout);
-        fclose(fileout);
-        if (flag == 0)
-            printf("COMPILED SUCCESSFULLY\n");
-        else
-            printf("COMPILATION FAILED\n");
-        //TESTING
-        if (flag == 0)
-        {
-            Node astRoot = makeAST(root, NULL);
-            PrintInorderASTree(astRoot);
-            Node stRoot = makeST(astRoot, NULL);
-            printST(stRoot);
-        }
-        //TESTINGEND
-    }
-    else
-    {
-        printf("restart the code. Error Input\n");
-    }
-
     return 0;
 }
