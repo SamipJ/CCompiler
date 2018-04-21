@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     }
     root = FillTrie();
     // printf(" (a) FIRST and FOLLOW set automated \n (b) Both lexical and syntax analysis modules implemented\n (c) Runs on all testcases\n\n");
-    printf("LEVEL 4:Symbol Table/AST/Semantic Rules modules work\n");
+    printf("LEVEL 4:Symbol Table/AST/Semantic Rules modules work\n\n");
     while (1)
     {
         flag = 0;
