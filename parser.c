@@ -8,7 +8,7 @@
 #include "parser.h"
 #include "_Stack.h"
 #include "_Tree.h"
-extern int lineNo, bufSize, bufIndex, flag;
+extern int lineNo, bufSize, bufIndex, flag, sizeparse, countparse;
 extern char *buf;
 extern FILE *fp;
 // extern int noofnt;
@@ -481,6 +481,9 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
     Finish->type = FINISH;
     push(stackH, Finish);
     push(stackH, Start);
+    countparse++;
+    sizeparse += sizeof(rhside);
+    sizeparse += sizeof(node);
     Node root = new_node(Start, false);
     Node currentNode = root;
     Rhs stackPop, stackPush;
@@ -534,7 +537,9 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                 }
                 else
                 {
+                    sizeparse = sizeparse + sizeof(Token) - sizeof(rhside);
                     currentNode->data = t;
+
                     currentNode = nextNT(currentNode);
                     // free(t);
                     // free(stackPop);
@@ -572,11 +577,15 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                     while (stackPush != NULL && ((stackPush->type != EPSILON && stackPush->isTerminal) || (!stackPush->isTerminal)))
                     {
                         push(revStack, stackPush);
+                        countparse++;
+                        sizeparse = sizeparse + sizeof(rhside) + sizeof(node);
                         add_child(currentNode, stackPush, stackPush->isTerminal);
                         stackPush = stackPush->next;
                     }
                     if (stackPush != NULL && (stackPush->type == EPSILON && stackPush->isTerminal))
                     {
+                        countparse++;
+                        sizeparse = sizeparse + sizeof(rhside) + sizeof(node);
                         add_child(currentNode, stackPush, stackPush->isTerminal);
                         currentNode = currentNode->child;
                         // currentNode->data = stackPush;

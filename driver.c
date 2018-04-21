@@ -15,6 +15,10 @@ FILE *fp;
 int strsize;
 int flag = 0;
 int memory = 0;
+int countparse = 0;
+int sizeparse = 0;
+int countast = 0;
+int sizeast = 0;
 
 int main(int argc, char **argv)
 {
@@ -113,6 +117,31 @@ int main(int argc, char **argv)
         }
         case 4:
             //calculate size
+            countast = 0;
+            countparse = 0;
+            sizeast = 0;
+            sizeparse = 0;
+            Grammer G = readGrammer("Grammer.txt");
+            char **First = InitialiseFirst();
+            MakeFirst(G, First);
+            char **Follow = InitialiseFollow();
+            MakeFollow(G, Follow, First);
+            Rules **parseTable = MakeParseTable(G, Follow, First);
+            Node root = makeParseTree(parseTable, First, Follow);
+            if (flag == 0)
+            {
+                Node astRoot = makeAST(root, NULL);
+                printf("%d %d\n", sizeparse, countparse);
+                printf("%d %d\n", sizeast, countast);
+                printf(" Parse Tree nodes : %d \t\t Allocated Memory : %d Bytes\n AST nodes : %d\t\t\tAllocated Memory : %d Bytes\n Compression percentage : %.2f\n",
+                       countparse, sizeparse, countast, sizeast, ((float)(sizeparse - sizeast) / sizeparse) * 100);
+                // printf("Printing Inorder Traversal of AST\n");
+                // PrintInorderASTree(astRoot);
+                // Node stRoot = makeST(astRoot, NULL);
+                // printST(stRoot);
+            }
+            else
+                printf("SYNTACTIC FAILURE\n");
             break;
         case 5:
         {

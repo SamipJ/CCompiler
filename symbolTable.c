@@ -210,7 +210,7 @@ Node makeST(Node astRoot, Node stRoot)
                 if (checkDeclaration(stRoot, child->data) != INT)
                 {
                     flag = 1;
-                    printf("line no.: %d\t Semantic error: \"%s\" should be of type INT \n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                    printf("line no.: %d\t Semantic error: \"%s\" should be of type INT \n", ((tokenPtr)child->data)->lineno, ((tokenPtr)child->data)->string);
                 }
                 child = child->sibling;
             }

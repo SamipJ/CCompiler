@@ -4,12 +4,15 @@
 #include <string.h>
 #include "ast.h"
 #include "_Tree.h"
+extern int sizeast, countast;
 
 Node makeAST(Node parseTreeNode, Node parentAST)
 {
     Node root = NULL;                  // = (Node)calloc(1, sizeof(node));
     if (parseTreeNode->parent == NULL) //root of parsetree
     {
+        countast++;
+        sizeast = sizeast + sizeof(node) + sizeof(astnode);
         root = (Node)calloc(1, sizeof(node));
         root->isterminal = false;
         root->data = calloc(1, sizeof(astnode));
@@ -52,6 +55,8 @@ Node makeAST(Node parseTreeNode, Node parentAST)
             astdata->isImp = false;
             astdata->type = datatype;
             Node curnode = add_child(parentAST, astdata, false);
+            countast++;
+            sizeast = sizeast + sizeof(astdata) + sizeof(node);
             Node child = parseTreeNode->child;
             while (child)
             {
@@ -76,6 +81,8 @@ Node makeAST(Node parseTreeNode, Node parentAST)
                         }
                     }
                     curnode->child->parent = parentAST;
+                    sizeast = sizeast - sizeof(astnode) - sizeof(node);
+                    countast--;
                     free(astdata);
                     free(curnode);
                 }
@@ -105,6 +112,8 @@ Node makeAST(Node parseTreeNode, Node parentAST)
                         }
                         child = child->sibling;
                     }
+                    countast--;
+                    sizeast = sizeast - sizeof(node);
                     free(curnode);
                 } //do something
             }
@@ -139,6 +148,8 @@ Node makeAST(Node parseTreeNode, Node parentAST)
         {
             // if (datatype == NUM) //delete later
             // return root;
+            sizeast += sizeof(node) + sizeof(Token);
+            countast++;
             Node curnode = add_child(parentAST, data, true);
         }
         else if (datatype == SIZE)
@@ -146,6 +157,8 @@ Node makeAST(Node parseTreeNode, Node parentAST)
             astNode data = (astNode)calloc(1, sizeof(astnode));
             data->isImp = true;
             data->type = datatype;
+            countast++;
+            sizeast += sizeof(astnode) + sizeof(node);
             Node curnode = add_child(parentAST, data, false);
         } //take care of epsilon and other useless terminals
         // else if (datatype == EPSILON || datatype == SQO || datatype == SQC || datatype == END || datatype == SEMICOLON || datatype == COMMA || datatype == OP || datatype == CL || datatype == FUNCTION || datatype == ASSIGNOP)
