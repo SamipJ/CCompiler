@@ -9,6 +9,8 @@ void printGrammer(Grammer G);
 extern const char keys2[][15];
 extern const char keys1[][30];
 
+char **InitialiseFirst();
+char **InitialiseFollow();
 struct TrieNode *FillTrieforGrammer();
 void MakeFirst(Grammer G, char **First);
 void FirstDAC(Grammer G, char **First, char *firstDone, int key);

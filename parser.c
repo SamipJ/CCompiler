@@ -168,6 +168,31 @@ void printGrammer(Grammer G)
     }
 }
 
+char **InitialiseFirst()
+{
+    char **First = (char **)calloc(noofnt, sizeof(char *));
+    int i, j;
+    for (i = 0; i < noofnt; i++)
+    {
+        First[i] = (char *)calloc(nooft, sizeof(char));
+        for (j = 0; j < nooft; j++)
+            First[i][j] = '0';
+    }
+    return First;
+}
+char **InitialiseFollow()
+{
+    char **Follow = (char **)calloc(noofnt, sizeof(char *));
+    int i, j;
+    for (i = 0; i < noofnt; i++)
+    {
+        Follow[i] = (char *)calloc(nooft, sizeof(char));
+        for (j = 0; j < nooft; j++)
+            Follow[i][j] = '0';
+    }
+    return Follow;
+}
+
 void MakeFirst(Grammer G, char **First)
 {
     int i;
@@ -446,8 +471,6 @@ void printParseTable(Rules **parseTable)
 
 Node makeParseTree(Rules **parseTable, char **First, char **Follow)
 {
-    // char keys1[][44] = {"mainFunction", "stmtsAndFunctionDefs", "moreStmtAndFunctionDefs", "stmtOrFunctionDef", "stmt", "functionDef", "parameterList", "typevar", "remainingList", "declarationStmt", "varList", "moreIds", "assignFuncCallSizeStmt", "funcCallSizeStmt", "sizeStmt", "conditionalStmt", "otherStmts", "elseStmt", "ioStmt", "funCallStmt", "emptyOrInputParameterList", "inputParameterList", "listVar", "assignmentStmt", "arithmeticExpression", "arithmeticExpression1", "arithmeticExpression2", "arithmeticExpression3", "varExpression", "operatorplusminus", "operatormuldiv", "booleanExpression", "booleanExpression2", "moreBooleanExpression", "constrainedVars", "matrixVar", "matrixRows", "matrixRows1", "matrixRow", "matrixRow1", "var", "matrixElement", "logicalOp", "relationalOp"};
-    // char keys2[][43] = {"NONE", "ERROR", "ASSIGNOP", "COMMENT", "FUNID", "ID", "NUM", "RNUM", "STR", "END", "INT", "REAL", "STRING", "MATRIX", "MAIN", "SQO", "SQC", "OP", "CL", "SEMICOLON", "COMMA", "IF", "ELSE", "ENDIF", "READ", "PRINT", "FUNCTION", "PLUS", "MINUS", "MUL", "DIV", "SIZE", "AND", "OR", "NOT", "LT", "LE", "EQ", "GT", "GE", "NE", "EPSILON", "FINISH"};
     Stack stackH = createStack(100);
     Stack revStack = createStack(100);
     Rhs Start = (Rhs)calloc(1, sizeof(rhside));
@@ -508,53 +531,6 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                     flag = 1;
                     // // break;
                     continue;
-
-                    // while (t->type != SEMICOLON)
-                    // {
-                    //     if (fp != NULL || buf[bufIndex] != '\0' || isEmpty(stackH) != 0)
-                    //     {
-                    //         t = getNextToken();
-                    //         printToken(t);
-                    //         if (t->type == COMMENT || t->type == ERROR || t->type == NONE)
-                    //         {
-                    //             free(t);
-                    //             continue;
-                    //         }
-                    //     }
-                    //     else
-                    //     {
-                    //         break;
-                    //     }
-                    // }
-                    // if (!(stackPop->isTerminal) && stackPop->type == moreStmtAndFunctionDefs)
-                    // {
-                    //     push(stackH, stackPop);
-                    // }
-                    // else
-                    // {
-                    //     while (!(stackPop->isTerminal && stackPop->type == SEMICOLON))
-                    //     {
-                    //         if (!isEmpty(stackH))
-                    //         {
-                    //             printf("POP: ");
-                    //             stackPop = pop(stackH);
-                    //             if (stackPop->isTerminal)
-                    //             {
-                    //                 printf("%s\n", keys2[stackPop->type]);
-                    //             }
-                    //             else
-                    //             {
-                    //                 printf("%s\n", keys1[stackPop->type]);
-                    //             }
-                    //             currentNode = nextNT(currentNode);
-                    //         }
-                    //         else
-                    //         {
-                    //             break;
-                    //         }
-                    //     }
-                    // }
-                    // break;
                 }
                 else
                 {
@@ -649,16 +625,7 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                         {
                             if (!isEmpty(stackH))
                             {
-                                // printf("POP: ");
                                 stackPop = pop(stackH);
-                                // if (stackPop->isTerminal)
-                                // {
-                                //     printf("%s\n", keys2[stackPop->type]);
-                                // }
-                                // else
-                                // {
-                                //     printf("%s\n", keys1[stackPop->type]);
-                                // }
                                 currentNode = nextNT(currentNode);
                             }
                             else
@@ -669,65 +636,6 @@ Node makeParseTree(Rules **parseTable, char **First, char **Follow)
                     }
                     printf("%d\n", t->lineno);
                     break;
-                    // while (1)
-                    // {
-                    //     t = getNextToken();
-                    //     if (t->type == COMMENT || t->type == ERROR || t->type == NONE)
-                    //     {
-                    //         free(t);
-                    //         continue;
-                    //     }
-                    //     if (t->type == FINISH)
-                    //     {
-                    //         break;
-                    //     }
-                    //     if (Follow[stackPop->type][t->type] == '1')
-                    //     {
-                    //         // flag = 1;
-                    //         break;
-                    //     }
-                    //     else if (First[stackPop->type][t->type] == '1')
-                    //     {
-                    //         stackPushRule = parseTable[stackPop->type][t->type];
-
-                    //         // free(stackPop);
-                    //         if (stackPushRule != NULL)
-                    //         {
-                    //             stackPush = stackPushRule->rule;
-                    //             while (stackPush != NULL && ((stackPush->type != EPSILON && stackPush->isTerminal) || (!stackPush->isTerminal)))
-                    //             {
-                    //                 push(revStack, stackPush);
-                    //                 add_child(currentNode, stackPush, stackPush->isTerminal);
-                    //                 stackPush = stackPush->next;
-                    //             }
-                    //             if (stackPush != NULL && (stackPush->type == EPSILON && stackPush->isTerminal))
-                    //             {
-                    //                 currentNode->data = stackPush;
-                    //                 currentNode->isterminal = true;
-                    //                 currentNode = nextNT(currentNode);
-                    //             }
-                    //             else
-                    //             {
-                    //                 currentNode = currentNode->child;
-                    //                 while (!isEmpty(revStack))
-                    //                 {
-                    //                     push(stackH, pop(revStack));
-                    //                 }
-                    //             }
-                    //         }
-                    //     }
-                    //     else if (First[stackPop->type][EPSILON] = '1')
-                    //     {
-                    //         // if (!isEmpty(stackH))
-                    //         // {
-                    //         //     stackPop = pop(stackH);
-                    //         // }
-                    //         break;
-                    //     }
-                    // }
-                    // if (flag == 1)
-                    // continue;
-                    // break;
                 }
             }
         }

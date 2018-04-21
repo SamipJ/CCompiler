@@ -886,11 +886,11 @@ void printToken(tokenPtr t)
 {
     if (t->type == NUM)
     {
-        printf("TOKEN: %s LINENO: %d VALUE: %d\n", typeTok[t->type], t->lineno, (int)(t->value));
+        printf("LINENO: %d \t VALUE: %-20d \t TOKEN: %s \n", t->lineno, (int)(t->value), typeTok[t->type]);
     }
     else if (t->type == RNUM)
     {
-        printf("TOKEN: %s LINENO: %d VALUE: %.2f\n", typeTok[t->type], t->lineno, t->value);
+        printf("LINENO: %d \t VALUE: %-20.2f \t TOKEN: %s \n", t->lineno, t->value, typeTok[t->type]);
     }
     else if (t->type == FINISH)
     {
@@ -898,7 +898,7 @@ void printToken(tokenPtr t)
     }
     else //if (t->type == STR)
     {
-        printf("TOKEN: %s LINENO: %d VALUE: %s\n", typeTok[t->type], t->lineno, t->string);
+        printf("LINENO: %d \t VALUE: %-20s \t TOKEN: %s \n", t->lineno, t->string, typeTok[t->type]);
     }
     // else if (t->type == ID)
     // {
