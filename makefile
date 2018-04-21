@@ -33,4 +33,4 @@ semantic:
 	gcc -c -g semantic.c
 
 clean:
-	rm *.o stage1exe parsetreeoutfile*
+	rm *.o stage1exe compiler parsetreeoutfile*
