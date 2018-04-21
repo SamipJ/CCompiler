@@ -102,7 +102,7 @@ int main(int argc, char **argv)
             if (flag == 0)
             {
                 Node astRoot = makeAST(root, NULL);
-                printf("Printing Inorder Traversal of AST\n");
+                printf("Printing Inorder Traversal of AST (\\|/ indicates going to child ,-> is going to sibling and  /|\\ indicates going to parent)\n");
                 PrintInorderASTree(astRoot);
                 // Node stRoot = makeST(astRoot, NULL);
                 // printST(stRoot);
