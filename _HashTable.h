@@ -60,7 +60,7 @@ void assignwidth(htHead head, char *id, int x, int y);
 void printHT(htHead head);
 void addInput(htHead head, enum tokenType type, char *id);
 void addOutput(htHead head, enum tokenType type, char *id);
-Node findFunc(char *funid, Node stRoot);
+Node findFunc(char *funid, int lineno, Node stRoot);
 sizeptr returnSize(Node stRoot, tokenPtr token);
 void setInitialised(Node stRoot, tokenPtr token);
 #endif

@@ -61,9 +61,9 @@ Node makeST(Node astRoot, Node stRoot)
                         child = child->sibling;
                         char *id = ((tokenPtr)child->data)->string;
                         addOutput(stRoot->data, type, id);
-                        int check = checkDeclaration(stRoot, (tokenPtr)child->data);
+                        int check = checkScopeDeclaration(stRoot, (tokenPtr)child->data);
                         if (check == ERROR)
-                            insertInHT(createHTNode(id, type, 1), stRoot->data);
+                            insertInHT(createHTNode(id, type, 0), stRoot->data);
                         else
                         {
                             printf("ERROR(A) in line %d\n", ((tokenPtr)child->data)->lineno);
@@ -80,7 +80,7 @@ Node makeST(Node astRoot, Node stRoot)
                         child = child->sibling;
                         char *id = ((tokenPtr)child->data)->string;
                         addInput(stRoot->data, type, id);
-                        int check = checkDeclaration(stRoot, (tokenPtr)child->data);
+                        int check = checkScopeDeclaration(stRoot, (tokenPtr)child->data);
                         if (check == ERROR)
                             insertInHT(createHTNode(id, type, 1), stRoot->data);
                         else
@@ -113,7 +113,7 @@ Node makeST(Node astRoot, Node stRoot)
             while (child)
             {
                 char *id = ((tokenPtr)child->data)->string;
-                int check = checkDeclaration(stRoot, (tokenPtr)child->data);
+                int check = checkScopeDeclaration(stRoot, (tokenPtr)child->data);
                 if (check == ERROR)
                     insertInHT(createHTNode(id, type, 1), stRoot->data);
                 else
@@ -149,10 +149,10 @@ Node makeST(Node astRoot, Node stRoot)
                 }
                 else
                 {
-                    if (strcmp("u", ((tokenPtr)astRoot->child->data)->string) == 0)
-                    {
-                        printf("hello\n");
-                    }
+                    // if (strcmp("u", ((tokenPtr)astRoot->child->data)->string) == 0)
+                    // {
+                    //     printf("hello\n");
+                    // }
                     setInitialised(stRoot, (tokenPtr)astRoot->child->data);
                 }
             }
@@ -171,9 +171,10 @@ Node makeST(Node astRoot, Node stRoot)
                     child = child->sibling;
                 }
             }
-            Node temp = findFunc(((tokenPtr)child->data)->string, stRoot);
+            Node temp = findFunc(((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno, stRoot);
             if (temp)
             {
+
                 parNode input = ((htHead)temp->data)->input;
                 parNode output = ((htHead)temp->data)->output;
                 Node outputAST = astRoot->child;
@@ -279,10 +280,14 @@ Node makeST(Node astRoot, Node stRoot)
                 printf("ERROR(K) BOOLEAN Expression incorrect on line %d\n", ((tokenPtr)temp->data)->lineno);
             }
             child = child->sibling;
-            while (!(!child->isterminal && !((astNode)child->data)->isImp && ((astNode)child->data)->type == elseStmt))
+            while (child && !(!child->isterminal && !((astNode)child->data)->isImp && ((astNode)child->data)->type == elseStmt))
             {
                 makeST(child, stRoot);
                 child = child->sibling;
+            }
+            if (child == NULL)
+            {
+                return stRoot;
             }
             child = child->child;
             while (child)

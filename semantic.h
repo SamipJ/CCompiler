@@ -27,5 +27,6 @@ int checkDeclaration(Node stRoot, tokenPtr token);
 int checkInitialization(Node stRoot);
 void compareParameters(Node stRoot, parNode input, Node inputAST, Node till);
 int checkOverloading(char *funcid, int lineno, Node stRoot);
+int checkScopeDeclaration(Node stRoot, tokenPtr token);
 
 #endif

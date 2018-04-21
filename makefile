@@ -7,7 +7,7 @@ linkall: driver
 	gcc lexer.o _Tree.o semantic.o ast.o _Trie.o _HashTable.o symbolTable.o _Stack.o parser.o driver.o -o stage1exe
 
 gdb : linkall
-	gdb --args ./stage1exe ./revised_testcases/testcase4.txt ./parsetreeoutfile.txt
+	gdb --args ./stage1exe ./revised_testcases/testcase5.txt ./parsetreeoutfile.txt
 
 driver: lexer parser ast symbolTable semantic driver.c
 	gcc -c -g driver.c

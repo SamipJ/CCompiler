@@ -162,8 +162,10 @@ void assignwidth(htHead head, char *id, int x, int y)
 {
     int found = 0, h = myhash(id);
     hashTable temp = head->ht[h];
-    temp->x = x;
-    temp->y = y;
+    if (temp == NULL)
+    {
+        printf("hello\n");
+    }
     while (temp)
     {
         if (strcmp(temp->id, id) == 0)
@@ -173,6 +175,8 @@ void assignwidth(htHead head, char *id, int x, int y)
                 temp->width = x;
             else
                 temp->width = x * y * 2;
+            temp->x = x;
+            temp->y = y;
             temp->offset = head->currentoffset;
             head->currentoffset += temp->width;
             break;
@@ -201,8 +205,13 @@ void printHT(htHead head)
     return;
 }
 
-Node findFunc(char *funid, Node stRoot)
+Node findFunc(char *funid, int lineno, Node stRoot)
 {
+    if (strcmp(funid, ((htHead)stRoot->data)->scope) == 0)
+    {
+        printf("ERROR(R) recursive func call on line %d \n", lineno);
+        return NULL;
+    }
     Node child = stRoot->child;
     while (child)
     {
@@ -211,7 +220,10 @@ Node findFunc(char *funid, Node stRoot)
         else
             child = child->sibling;
     }
-    return NULL;
+    if (stRoot->parent)
+        return findFunc(funid, lineno, stRoot->parent);
+    else
+        return NULL;
 }
 
 sizeptr returnSize(Node stRoot, tokenPtr token)

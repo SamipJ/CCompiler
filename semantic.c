@@ -18,6 +18,21 @@ int checkDeclaration(Node stRoot, tokenPtr token)
     }
 }
 
+int checkScopeDeclaration(Node stRoot, tokenPtr token)
+{
+    char *id = token->string;
+    int check = -1;
+    if ((check = checkHT(stRoot->data, id)) != -1)
+        return check;
+    else
+    {
+        // error generation
+        // int lineno = token->lineno;
+        // int type = token->type;
+        return ERROR;
+    }
+}
+
 int typeAE(Node stRoot, Node astRoot)
 {
     if (!astRoot->isterminal)
@@ -363,6 +378,8 @@ sizeptr computeSize(Node stRoot, Node astRoot, int type)
 int checkOverloading(char *funcid, int lineno, Node stRoot)
 {
     Node parentscope = stRoot->parent;
+    // if (parentscope == NULL)
+    // return 0;
     Node child = parentscope->child;
     while (child)
     {
@@ -373,5 +390,8 @@ int checkOverloading(char *funcid, int lineno, Node stRoot)
         }
         child = child->sibling;
     }
-    return 0;
+    if (parentscope->parent)
+        return checkOverloading(funcid, lineno, parentscope);
+    else
+        return 0;
 }
