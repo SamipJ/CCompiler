@@ -1,6 +1,6 @@
 // SAMIP JASANI 2015A7PS0127P
 #include "_HashTable.h"
-
+extern int flag;
 int myhash(char *str)
 {
     unsigned long myhash = 5381;
@@ -24,7 +24,7 @@ htHead createEmptyHT(const char *scope, int nesting_level, const char *parentsco
     return head;
 }
 
-void addInput(htHead head, enum tokenType type, char *id)
+void addInput(htHead head, enum tokenType type, char *id, int lineno)
 {
     parNode parameter = (parNode)malloc(sizeof(parnode));
     parameter->type = type;
@@ -39,14 +39,16 @@ void addInput(htHead head, enum tokenType type, char *id)
         {
             if (strcmp(temp->id, parameter->id) == 0)
             {
-                printf("ERROR(D) in %s\n", temp->id);
+                printf("line no.: %d\t Semantic error: The ID \"%s\" is already used before in input parameter list \n", lineno, temp->id);
+                flag = 1;
                 return;
             }
             temp = temp->next;
         }
         if (strcmp(temp->id, parameter->id) == 0)
         {
-            printf("ERROR(D) in %s\n", temp->id);
+            printf("line no.: %d\t Semantic error: The ID \"%s\" is already used before in input parameter list \n", lineno, temp->id);
+            flag = 1;
             return;
         }
         else
@@ -57,7 +59,7 @@ void addInput(htHead head, enum tokenType type, char *id)
     return;
 }
 
-void addOutput(htHead head, enum tokenType type, char *id)
+void addOutput(htHead head, enum tokenType type, char *id, int lineno)
 {
     parNode parameter = (parNode)malloc(sizeof(parnode));
     parameter->type = type;
@@ -72,14 +74,17 @@ void addOutput(htHead head, enum tokenType type, char *id)
         {
             if (strcmp(temp->id, parameter->id) == 0)
             {
-                printf("ERROR(E) in %s\n", temp->id);
+                printf("line no.: %d\t Semantic error: The ID \"%s\" is already used before in output parameter list \n", lineno, temp->id);
+                flag = 1;
+
                 return;
             }
             temp = temp->next;
         }
         if (strcmp(temp->id, parameter->id) == 0)
         {
-            printf("ERROR(E) in %s\n", temp->id);
+            printf("line no.: %d\t Semantic error: The ID \"%s\" is already used before in output parameter list \n", lineno, temp->id);
+            flag = 1;
             return;
         }
         else
@@ -190,7 +195,6 @@ void assignwidth(htHead head, char *id, int x, int y)
 
 void printHT(htHead head)
 {
-    printf("Scope: %s\tNesting Level: %d\tParent Scope:%s\tLine No:%d\n", head->scope, head->nesting_level, head->parentscope, head->lineno);
     int i;
     hashTable temp;
     for (i = 0; i < M; i++)
@@ -198,7 +202,7 @@ void printHT(htHead head)
         temp = head->ht[i];
         while (temp)
         {
-            printf("%s\t%s\t%d\t%d\t%d\n", temp->id, keys2[temp->type], temp->width, temp->offset, temp->initialised);
+            printf("%-5s\t%-20s\t%d\t%-20s\t%-5s\t%d\t%d\n", temp->id, head->scope, head->nesting_level, head->parentscope, keys2[temp->type], temp->width, temp->offset);
             temp = temp->next;
         }
     }
@@ -209,7 +213,8 @@ Node findFunc(char *funid, int lineno, Node stRoot)
 {
     if (strcmp(funid, ((htHead)stRoot->data)->scope) == 0)
     {
-        printf("ERROR(R) recursive func call on line %d \n", lineno);
+        printf("line no.: %d\t Semantic error: The function \"%s\" is a recursive function call \n", lineno, funid);
+        flag = 1;
         return NULL;
     }
     Node child = stRoot->child;

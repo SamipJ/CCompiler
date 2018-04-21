@@ -486,10 +486,10 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         if (islower(c) || c == ' ')
         {
             state = 11;
-            tokenp->string = calloc(3, sizeof(char));
-            tokenp->string[0] = '"';
-            tokenp->string[1] = c;
-            tokenp->string[2] = '\0';
+            tokenp->string = calloc(2, sizeof(char));
+            // tokenp->string[0] = '"';
+            tokenp->string[0] = c;
+            tokenp->string[1] = '\0';
             strsize++;
             bufIndex++;
         }
@@ -512,9 +512,9 @@ int getNextState(tokenPtr tokenp, int currentstate, char c)
         }
         else if (c == '"')
         {
-            tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
-            tokenp->string[strlen(tokenp->string) + 1] = '\0';
-            tokenp->string[strlen(tokenp->string)] = c;
+            // tokenp->string = realloc(tokenp->string, (strlen(tokenp->string) + 2) * sizeof(char));
+            // tokenp->string[strlen(tokenp->string) + 1] = '\0';
+            // tokenp->string[strlen(tokenp->string)] = c;
             bufIndex++;
             strsize++;
             if (strsize > 20)

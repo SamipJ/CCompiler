@@ -84,10 +84,10 @@ int main(int argc, char **argv)
             if (flag == 0)
             {
                 FileInorderTree(root, stdout);
-                printf("COMPILED SUCCESSFULLY\n");
+                printf("SYNTAX CORRECT\n");
             }
             else
-                printf("COMPILATION FAILED\n");
+                printf("SYNTAX FAILED\n");
             break;
         }
         case 3:
@@ -127,7 +127,10 @@ int main(int argc, char **argv)
             {
                 Node astRoot = makeAST(root, NULL);
                 Node stRoot = makeST(astRoot, NULL);
-                printST(stRoot);
+                if (flag == 0)
+                    printST(stRoot);
+                else
+                    printf("SEMANTIC FAILURE\n");
             }
             else
                 printf("SYNTACTIC FAILURE\n");
@@ -146,6 +149,10 @@ int main(int argc, char **argv)
             {
                 Node astRoot = makeAST(root, NULL);
                 Node stRoot = makeST(astRoot, NULL);
+                if (flag == 0)
+                    printf("SEMANTIC CORRECT\n");
+                else
+                    printf("SEMANTIC FAILURE\n");
             }
             else
                 printf("SYNTACTIC FAILURE\n");

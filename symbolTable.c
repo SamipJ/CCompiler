@@ -1,6 +1,6 @@
 #include "symbolTable.h"
 // #include "_HashTable.h"
-
+extern int flag;
 Node makeST(Node astRoot, Node stRoot)
 {
     // Node stRoot = NULL;
@@ -20,6 +20,7 @@ Node makeST(Node astRoot, Node stRoot)
         else if (!((astNode)astRoot->data)->isImp && ((astNode)astRoot->data)->type == functionDef)
         {
             //check for recursion overloading
+            int lineno = ((tokenPtr)astRoot->child->sibling->data)->lineno;
             htHead ht = createEmptyHT(keys2[FUNCTION], ((htHead)stRoot->data)->nesting_level + 1, ((htHead)stRoot->data)->scope);
             stRoot = add_child(stRoot, ht, false);
             int funcset = 0;
@@ -60,13 +61,15 @@ Node makeST(Node astRoot, Node stRoot)
                         enum tokenType type = ((astNode)child->data)->type;
                         child = child->sibling;
                         char *id = ((tokenPtr)child->data)->string;
-                        addOutput(stRoot->data, type, id);
                         int check = checkScopeDeclaration(stRoot, (tokenPtr)child->data);
+                        addOutput(stRoot->data, type, id, lineno);
                         if (check == ERROR)
+                        {
                             insertInHT(createHTNode(id, type, 0), stRoot->data);
+                        }
                         else
                         {
-                            printf("ERROR(A) in line %d\n", ((tokenPtr)child->data)->lineno);
+                            // printf("ERROR(A) in line %d\n", ((tokenPtr)child->data)->lineno);
                         }
                         // insertInHT(createHTNode(id, type, 0), stRoot->data);
                         child = child->sibling;
@@ -79,13 +82,13 @@ Node makeST(Node astRoot, Node stRoot)
                         enum tokenType type = ((astNode)child->data)->type;
                         child = child->sibling;
                         char *id = ((tokenPtr)child->data)->string;
-                        addInput(stRoot->data, type, id);
+                        addInput(stRoot->data, type, id, lineno);
                         int check = checkScopeDeclaration(stRoot, (tokenPtr)child->data);
                         if (check == ERROR)
                             insertInHT(createHTNode(id, type, 1), stRoot->data);
                         else
                         {
-                            printf("ERROR(A) in line %d\n", ((tokenPtr)child->data)->lineno);
+                            // printf("ERROR(A) in line %d\n", ((tokenPtr)child->data)->lineno);
                         }
                         // insertInHT(createHTNode(id, type, 1), stRoot->data);
                         child = child->sibling;
@@ -118,7 +121,8 @@ Node makeST(Node astRoot, Node stRoot)
                     insertInHT(createHTNode(id, type, 1), stRoot->data);
                 else
                 {
-                    printf("ERROR(A) in line %d\n", ((tokenPtr)child->data)->lineno);
+                    flag = 1;
+                    printf("line no.: %d\t Semantic error: Redeclaration of ID \"%s\" \n", ((tokenPtr)child->data)->lineno, ((tokenPtr)child->data)->string);
                 }
                 child = child->sibling;
             }
@@ -189,7 +193,10 @@ Node makeST(Node astRoot, Node stRoot)
                 }
             }
             else
-                (printf("ERROR(G) in line %d\n", ((tokenPtr)child->data)->lineno));
+            {
+                flag = 1;
+                printf("line no.: %d\t Semantic error: Function \"%s\" not defined in current scope \n", ((tokenPtr)child->data)->lineno, ((tokenPtr)child->data)->string);
+            }
         }
         else if (!((astNode)astRoot->data)->isImp && ((astNode)astRoot->data)->type == sizeStmt)
         {
@@ -202,7 +209,8 @@ Node makeST(Node astRoot, Node stRoot)
                 count++;
                 if (checkDeclaration(stRoot, child->data) != INT)
                 {
-                    printf("ERROR(N) %s not of type INT in line %d\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                    flag = 1;
+                    printf("line no.: %d\t Semantic error: \"%s\" should be of type INT \n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
                 }
                 child = child->sibling;
             }
@@ -211,29 +219,34 @@ Node makeST(Node astRoot, Node stRoot)
             {
                 if (checkDeclaration(stRoot, child->data) != MATRIX)
                 {
-                    printf("ERROR(M) %s should be of type MATRIX in line %d or LHS should have only 1 parameter\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                    flag = 1;
+                    printf("line no.: %d\t Semantic error:\"%s\" should be of type MATRIX or LHS should have only 1 parameter\n", ((tokenPtr)child->data)->lineno, ((tokenPtr)child->data)->string);
                 }
             }
             else if (count == 1)
             {
                 if (checkDeclaration(stRoot, child->data) != STRING)
                 {
-                    printf("ERROR(M) %s should be of type STRING in line %d or LHS should have 2 parameters\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                    flag = 1;
+                    printf("line no.: %d\t Semantic error:\"%s\" should be of type STRING or LHS should have 2 parameters\n", ((tokenPtr)child->data)->lineno, ((tokenPtr)child->data)->string);
                 }
             }
             else
             {
                 if (checkDeclaration(stRoot, child->data) == STRING)
                 {
-                    printf("ERROR(M) %s is of type STRING so in line %d LHS should have only 1 parameter\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                    flag = 1;
+                    printf("line no.: %d\tSemantic error: \"%s\" is of type STRING so LHS should have 1 parameters\n", ((tokenPtr)child->data)->lineno, ((tokenPtr)child->data)->string);
                 }
                 else if (checkDeclaration(stRoot, child->data) == MATRIX)
                 {
-                    printf("ERROR(M) %s is of type MATRIX in line %d so LHS should have 2 parameters\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                    flag = 1;
+                    printf("line no.: %d\t Semantic error:\"%s\" is of type MATRIX so LHS should have 2 parameters\n", ((tokenPtr)child->data)->lineno, ((tokenPtr)child->data)->string);
                 }
                 else
                 {
-                    printf("ERROR(M) %s is of type %s in line %d RHS should be STRING(LHS: 1 parameter) or MATRIX(LHS:2 parameters)\n", ((tokenPtr)child->data)->string, keys2[((tokenPtr)child->data)->type], ((tokenPtr)child->data)->lineno);
+                    flag = 1;
+                    printf("line no.: %d\t Semantic error:\"%s\" is of type \"%s\" so  RHS should be STRING(LHS: 1 parameter) or MATRIX(LHS:2 parameters)\n", ((tokenPtr)child->data)->lineno, ((tokenPtr)child->data)->string, keys2[((tokenPtr)child->data)->type]);
                 }
             }
         }
@@ -246,7 +259,8 @@ Node makeST(Node astRoot, Node stRoot)
                 int datatype = checkDeclaration(stRoot, child->data);
                 if (datatype == ERROR)
                 {
-                    printf("ERROR(U) undeclared %s on line %d\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                    flag = 1;
+                    printf("line no.: %d\t Semantic error: The ID \"%s\" is not declared \n", ((tokenPtr)child->data)->lineno, ((tokenPtr)child->data)->string);
                 }
                 else if (datatype == INT || datatype == REAL)
                 {
@@ -254,7 +268,8 @@ Node makeST(Node astRoot, Node stRoot)
                 }
                 else
                 {
-                    printf("%s is of type %s, only INT and REAL can be READ on line %d\n", ((tokenPtr)child->data)->string, keys2[checkDeclaration(stRoot, child->data)], ((tokenPtr)child->data)->lineno);
+                    flag = 1;
+                    printf("line no.: %d\t Semantic error: %s is of type %s, only INT and REAL can be READ\n", ((tokenPtr)child->data)->lineno, ((tokenPtr)child->data)->string, keys2[checkDeclaration(stRoot, child->data)]);
                 }
             }
             else
@@ -262,7 +277,8 @@ Node makeST(Node astRoot, Node stRoot)
                 int datatype = checkDeclaration(stRoot, child->data);
                 if (datatype == ERROR)
                 {
-                    printf("ERROR(U) undeclared %s on line %d\n", ((tokenPtr)child->data)->string, ((tokenPtr)child->data)->lineno);
+                    flag = 1;
+                    printf("line no.: %d\t Semantic error: The ID \"%s\" is not declared \n", ((tokenPtr)child->data)->lineno, ((tokenPtr)child->data)->string);
                 }
                 return stRoot;
             }
@@ -277,7 +293,8 @@ Node makeST(Node astRoot, Node stRoot)
                 {
                     temp = temp->child;
                 }
-                printf("ERROR(K) BOOLEAN Expression incorrect on line %d\n", ((tokenPtr)temp->data)->lineno);
+                flag = 1;
+                printf("line no.: %d\t Semantic error: BOOLEAN Expression incorrect\n", ((tokenPtr)temp->data)->lineno);
             }
             child = child->sibling;
             while (child && !(!child->isterminal && !((astNode)child->data)->isImp && ((astNode)child->data)->type == elseStmt))

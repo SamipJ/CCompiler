@@ -1,5 +1,6 @@
 #include "semantic.h"
 
+extern int flag;
 //check if declared
 int checkDeclaration(Node stRoot, tokenPtr token)
 {
@@ -167,11 +168,16 @@ int checkType(Node stRoot, Node astRoot)
     {
         if (lhs == ERROR)
         {
-            printf("ERROR(B) for %s in line %d\n", ((tokenPtr)astRoot->child->data)->string, ((tokenPtr)astRoot->child->data)->lineno);
+            flag = 1;
+            printf("line no.: %d\t Semantic error: The ID \"%s\" is not declared \n", ((tokenPtr)astRoot->child->data)->lineno, ((tokenPtr)astRoot->child->data)->string);
         }
         else
         {
-            printf("ERROR(Z) in line %d\n", ((tokenPtr)astRoot->child->data)->lineno);
+            flag = 1;
+            if (rhs == ERROR)
+                printf("line no.: %d\t Semantic error: Type mismatch LHS (\"%s\") and RHS (\"undefined\") \n", ((tokenPtr)astRoot->child->data)->lineno, keys2[lhs]);
+            else
+                printf("line no.: %d\t Semantic error: Type mismatch LHS (\"%s\") and RHS (\"%s\") \n", ((tokenPtr)astRoot->child->data)->lineno, keys2[lhs], keys2[rhs]);
         }
     }
     return 0;
@@ -191,7 +197,8 @@ int checkInitialization(Node stRoot)
             if (temp->initialised == 0)
             {
                 check = 0;
-                printf("ERROR(C) in %s in line %d\n", temp->id, ((htHead)stRoot->data)->lineno);
+                printf("line no.: %d\t Semantic error: output parameter \"%s\" is not assigned value in scope of function \"%s\" \n", ((htHead)stRoot->data)->lineno, temp->id, ((htHead)stRoot->data)->scope);
+                flag = 1;
             }
 
             temp = temp->next;
@@ -202,7 +209,7 @@ int checkInitialization(Node stRoot)
 
 void compareParameters(Node stRoot, parNode input, Node inputAST, Node till)
 {
-    int lineno = 0;
+    int lineno = 1;
     if (inputAST)
         lineno = ((tokenPtr)inputAST->data)->lineno;
     int type;
@@ -217,16 +224,23 @@ void compareParameters(Node stRoot, parNode input, Node inputAST, Node till)
         }
         else
         {
+            flag = 1;
             if (type != ERROR)
             {
-                if (lineno != 0)
-                    printf("ERROR(E) mismatch parameter type in line %d\n", lineno);
+                if (lineno != 1 && ((tokenPtr)inputAST->data)->type == ID)
+                    printf("line no.: %d\t Semantic error: type of parameter \"%s\" (\"%s\") and ID \"%s\" (\"%s\") do not match \n", lineno, input->id, keys2[input->type], ((tokenPtr)inputAST->data)->string, keys2[type]);
+                else if (lineno != 1 && ((tokenPtr)inputAST->data)->type == NUM)
+                    printf("line no.: %d\t Semantic error: type of parameter \"%s\" (\"%s\") and NUM \"%d\" (\"%s\") do not match \n", lineno, input->id, keys2[input->type], (int)((tokenPtr)inputAST->data)->value, keys2[type]);
+                else if (lineno != 1 && ((tokenPtr)inputAST->data)->type == RNUM)
+                    printf("line no.: %d\t Semantic error: type of parameter \"%s\" (\"%s\") and RNUM \"%.2f\" (\"%s\") do not match \n", lineno, input->id, keys2[input->type], ((tokenPtr)inputAST->data)->value, keys2[type]);
+                else if (lineno != 1 && ((tokenPtr)inputAST->data)->type == STR)
+                    printf("line no.: %d\t Semantic error: type of parameter \"%s\" (\"%s\") and STR \"%s\" (\"%s\") do not match \n", lineno, input->id, keys2[input->type], ((tokenPtr)inputAST->data)->string, keys2[type]);
                 else
-                    printf("ERROR(E) mismatch parameter type\n");
+                    printf("Semantic error: type of parameter \"%s\" (\"%s\") and ID \"%s\" (\"%s\") do not match \n", input->id, keys2[input->type], ((tokenPtr)inputAST->data)->string, keys2[type]);
             }
             else
             {
-                printf("ERROR(B) for %s in line %d\n", ((tokenPtr)inputAST->data)->string, lineno);
+                printf("line no.: %d\t Semantic error: The ID \"%s\" is not declared \n", lineno, ((tokenPtr)inputAST->data)->string);
             }
             input = input->next;
             inputAST = inputAST->sibling;
@@ -237,9 +251,9 @@ void compareParameters(Node stRoot, parNode input, Node inputAST, Node till)
     else
     {
         if (lineno != 0)
-            printf("ERROR(F) mismatch parameter length in line %d\n", lineno);
+            printf("line no.: %d\t Semantic error: mismatch parameter length \n", lineno);
         else
-            printf("ERROR(F) mismatch parameter length\n");
+            printf("Semantic error: mismatch parameter length \n");
     }
 }
 
@@ -280,7 +294,9 @@ sizeptr computeSize(Node stRoot, Node astRoot, int type)
                         temp = temp->child;
                     }
                     int lineno = ((tokenPtr)temp->data)->lineno;
-                    printf("ERROR(X) matrix size mismatch in line %d\n", lineno);
+                    flag = 1;
+                    printf("line no.: %d\t Semantic error: Matrix Size mismatch \n", lineno);
+                    // printf("ERROR(X) matrix size mismatch in line %d\n", lineno);
                 }
                 return NULL;
             }
@@ -307,7 +323,8 @@ sizeptr computeSize(Node stRoot, Node astRoot, int type)
                     {
                         if (y != temp)
                         {
-                            printf("Error(X) matrix Row size variable in line %d", ((tokenPtr)astRoot->child->child->data)->lineno); //error
+                            flag = 1;
+                            printf("line no.: %d\t Semantic error: Matrix Row Size variable \n", ((tokenPtr)astRoot->child->child->data)->lineno);
                             return NULL;
                         }
                     }
@@ -385,7 +402,8 @@ int checkOverloading(char *funcid, int lineno, Node stRoot)
     {
         if (strcmp(((htHead)child->data)->scope, funcid) == 0)
         {
-            printf("ERROR(O) for func %s in line %d\n", funcid, lineno);
+            flag = 1;
+            printf("line no.: %d\t Semantic error: Function \"%s\" is being overloaded which is not allowed \n", lineno, funcid);
             return 1;
         }
         child = child->sibling;
